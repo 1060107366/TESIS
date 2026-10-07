@@ -1,5 +1,6 @@
 
 ## **Requisitos Previos**
+## prove git
 Asegúrate de tener instalados los siguientes programas antes de comenzar con la configuración del proyecto:
 - Python 3.8 o superior
 - MySQL
