@@ -2,6 +2,7 @@
 Se desarrolla el contenido del Frontend del prototipo de CRM utilizando modulos de inteligencia artificial.
 
 ## Instalación
+### prove git push
 
 Se ha implementado el uso de Bun JS para el desarrollo, test, ejecución y empaquetado del Frontend del proyecto.
 
