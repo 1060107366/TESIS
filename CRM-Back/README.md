@@ -23,7 +23,7 @@ Asegúrate de tener instalados los siguientes programas antes de comenzar con la
 ```
 2. **activa entorno virtual**
 ```powershell
-.venv\Scripts\activate
+.venv\Scripts\activate.bat
 ```
 3. **instala dependencias**
 ```powershell
