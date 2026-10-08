@@ -15,36 +15,42 @@ predictions_bp = Blueprint('predictions', __name__)
 
 # Prediccion de abandono para todos los clientes (CHURN)
 @predictions_bp.route('/predict-churn', methods=['GET'])
-def predict_churn():
+@jwt_required()
+def predict_churn_all():
     """
     Predice churn para todos los clientes y guarda la probabilidad en la base de datos.
     """
+    try:
+        print("Iniciando la actualización de Churn para todos los clientes...")
+        # Obtener datos de clientes, interacciones y métricas
+        clientes = Customer.query.all()
+        interacciones = InteraccionesCliente.query.all()
+        metricas = MetricasHistoricas.query.all()
+        
+        # Preparar datos para el modelo
+        data = prepare_churn_data(clientes, interacciones, metricas)
 
-    print("Iniciando la actualización de Churn para todos los clientes...")
-    # Obtener datos de clientes, interacciones y métricas
-    clientes = Customer.query.all()
-    interacciones = InteraccionesCliente.query.all()
-    metricas = MetricasHistoricas.query.all()
-
-    # Preparar datos para el modelo
-    data = prepare_churn_data(clientes, interacciones, metricas)
-
-    # Cargar el modelo entrenado
-    modelo = joblib.load("app/ia/churn_model/churn_model.pkl")
-
-    # Predecir probabilidades de churn
-    data["churn_probabilidad"] = modelo.predict_proba(data.drop(columns=["id"]))[:, 1]
-
-    # Actualizar la probabilidad de churn en la tabla Clientes
-    for _, row in data.iterrows():
-        cliente = Customer.query.get(row["id"])
-        if cliente:
-            cliente.probabilidad_churn = row["churn_probabilidad"]
-            db.session.add(cliente)  # Marcar el cliente para actualización
-
-    db.session.commit()  # Confirmar los cambios en la base de datos
-    
-    return  jsonify({"mensage": " Actualización de Churn completada."}), 200
+        if data.empty:
+            return jsonify({"message": "No hay clientes para procesar."}), 200
+            # Cargar el modelo entrenado
+            modelo = joblib.load("app/ia/churn_model/churn_model.pkl")
+            # Predecir probabilidades de churn
+            data["churn_probabilidad"] = modelo.predict_proba(data.drop(columns=["id"]))[:, 1]
+        
+            # Actualizar la probabilidad de churn en la tabla Clientes
+            for _, row in data.iterrows():
+                cliente = Customer.query.get(row["id"])
+                if cliente:
+                    cliente.probabilidad_churn = row["churn_probabilidad"]
+                    db.session.add(cliente)  # Marcar el cliente para actualización
+            db.session.commit()  # Confirmar los cambios en la base de datos
+            
+            return  jsonify({"mensage": " Actualización de Churn completada."}), 200
+    except FileNotFoundError:
+        return jsonify({"error": "Modelo de churn no encontrado en el servidor."}), 500
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Error al predecir churn: {str(e)}"}), 500
 
 
 # Tendencias globales de probabilidad de churn
@@ -80,7 +86,7 @@ def get_global_churn_avg():
 
 
 # Predecir Abandono para 1 cliente (Se utiliza al momento de crear una nueva compra)
-def predict_churn(customer_id):
+def predict_churn_for_customer(customer_id):
     """
     Predice churn para un solo cliente y retorna su probabilidad.
     """
@@ -96,30 +102,33 @@ def predict_churn(customer_id):
 
     # Preparar datos
     data = prepare_churn_data([cliente], interacciones, metricas)
-
+    if data.empty:
+        return None
     # Cargar modelo entrenado
     modelo = joblib.load("app/ia/churn_model/churn_model.pkl")
 
     # Predecir probabilidad de churn
-    churn_probabilidad = modelo.predict_proba(data.drop(columns=["id"]))[:, 1][0]
+    return modelo.predict_proba(data.drop(columns=["id"]))[:, 1][0]
 
-    return churn_probabilidad
 
 
 
 # Asignar Segmento (Clusters)
 @predictions_bp.route('/segment-clients', methods=['POST'])
+@jwt_required()
 def segment_clients():
     """
     Ejecuta la segmentación de clientes usando K-means.
     """
     try:
-        assign_segments_to_customers()
+        succes, msg = assign_segments_to_customers()
+        if not succes:
+            return jsonify({"error": msg}), 500
         return jsonify({"message": "Segmentación completada exitosamente."}), 200
     except ValueError as ve:
         return jsonify({"error": f"Error de validación: {str(ve)}"}), 400
-    except FileNotFoundError as fe:
-        return jsonify({"error": f"Archivo no encontrado: {str(fe)}"}), 500
+    except FileNotFoundError:
+        return jsonify({"error": "Modelo de segmentación no encontrado."}), 500
     except Exception as e:
         return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from app.models.customer import Customer
 from app.models.metricas_historicas import MetricasHistoricas
 from app import db
@@ -35,17 +35,15 @@ def calculate_average_order_value(total_compras, suma_total_compras):
 # Calcular el Customer Lifetime Value (CLV)
 def calculate_clv(valor_medio_orden, total_compras, fecha_creacion):
     """
-    Calcula el CLV basado en datos históricos del cliente.
+    CLV histórico normalizado: valor promedio generado por el cliente por mes de vida.
+    Evita división por cero para clientes creados el mismo día.
     """
-    # Calcular vida del cliente en años
-    vida_cliente = (datetime.utcnow() - fecha_creacion).days # Diferencia en días entre la creación del cliente y la fecha actual
+    dias_vida = (datetime.now(timezone.utc) - fecha_creacion).days
+    meses_vida = max(dias_vida, 1) / 30  # mínimo 1 "mes" para clientes nuevos
 
-    # Calcular total histórico de compras
     total_historico = valor_medio_orden * total_compras
-
-    # Calcular CLV
-    clv = total_historico / vida_cliente
-    return round(clv, 2)
+    clv_mensual = total_historico / meses_vida
+    return round(clv_mensual, 2)
 
 
 # Guardar métricas en la tabla MetricasHistoricas
@@ -71,7 +69,7 @@ def update_metrics(cliente):
     # Recalcular la frecuencia de compra
     cliente.frecuencia_compra = calculate_purchase_frequency(
         cliente.fecha_creacion,
-        cliente.ultima_compra if cliente.ultima_compra else datetime.utcnow(),
+        cliente.ultima_compra if cliente.ultima_compra else datetime.now(timezone.utc),
         cliente.total_compras
     )
     # Calcular CLV (Customer Lifetime Value)
@@ -80,31 +78,24 @@ def update_metrics(cliente):
         cliente.total_compras,
         cliente.fecha_creacion
     )
-    metrics = [
-        MetricasHistoricas(
-            cliente_id=cliente.id,
-            tipo_metrica="frecuencia_compra",
-            valor=cliente.frecuencia_compra,
-            fecha_registro=datetime.utcnow(),
-            periodo=datetime.utcnow().strftime("%B %Y")
-        ),
-        MetricasHistoricas(
-            cliente_id=cliente.id,
-            tipo_metrica="valor_medio_orden",
-            valor=cliente.valor_medio_orden,
-            fecha_registro=datetime.utcnow(),
-            periodo=datetime.utcnow().strftime("%B %Y")
-        ),
-        MetricasHistoricas(
-            cliente_id=cliente.id,
-            tipo_metrica="valor_cliente",
-            valor=cliente.valor_cliente,
-            fecha_registro=datetime.utcnow(),
-            periodo=datetime.utcnow().strftime("%B %Y")
-        )
+
+    periodo = datetime.now(timezone.utc).strftime("%B %Y")
+    metricas = [
+        ("frecuencia_compra", cliente.frecuencia_compra),
+        ("valor_medio_orden", cliente.valor_medio_orden),
+        ("valor_cliente", cliente.valor_cliente),
     ]
+    for tipo, valor in metricas:
+        existente = MetricasHistoricas.query.filter_by(
+            cliente_id=cliente.id, tipo_metrica=tipo, periodo=periodo
+        ).first()
+        if existente:
+            existente.valor = valor
+            existente.fecha_registro = datetime.now(timezone.utc)
+        else:
+            save_metrics(cliente.id, tipo, valor)
+            
     # Guardar cambios en la base de datos
-    db.session.add_all(metrics)
     db.session.commit()
 
 # Actualizar las métricas para todos los clientes (se puede programar para ejecutarse cada x tiempo)

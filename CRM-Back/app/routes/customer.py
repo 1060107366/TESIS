@@ -7,7 +7,7 @@ from app.models.metricas_historicas import MetricasHistoricas
 from app.models.recomendaciones import Recomendaciones
 from app.models.tipo_interaccion import TiposInteraccion
 from app.models.interacciones_cliente import InteraccionesCliente
-from app.routes.predictions import predict_churn
+from app.routes.predictions import predict_churn_for_customer
 from app.services.customer_service import create_customer
 from app.services.recommendation_service import generate_recommendations
 from app.services.metrics_service import calculate_purchase_frequency, update_metrics
@@ -22,75 +22,64 @@ def create_customer_endpoint():
     """
     Endpoint para crear un cliente. Registra también una compra inicial si se proporciona `valor_orden_total`.
     """
-
     user_id = get_jwt_identity()  # ID del usuario autenticado
-
     data = request.get_json()
 
     # Validar datos requeridos
     required_fields = ["nombre", "email", "telefono"]
-    missing_fields = [field for field in required_fields if field not in data]
+    missing_fields = [f for f in required_fields if f not in data]
     if missing_fields:
         return jsonify({"error": f"Faltan campos requeridos: {', '.join(missing_fields)}"}), 400
 
-    # Crear cliente utilizando el servicio
-    new_cliente = create_customer(data)
+    try:
+        new_cliente = create_customer(data)
 
-    # Calcular y actualizar métricas iniciales del cliente
-    update_metrics(new_cliente)
-
-    # Asignar segmento inicial
-    assign_segments_to_customers(new_cliente.id)
-    # 
-    generate_recommendations(new_cliente.id)
-
-    # Registrar interacción de creación del cliente
-    creation_interaction = InteraccionesCliente(
-        cliente_id=new_cliente.id,
-        usuario_id=user_id,
-        tipo_interaccion_id=1,  # Tipo predefinido para "Creación de cliente"
-        data_interaccion={"accion": "Creación de cliente", "estado": "completado"},
-        fecha_creacion=datetime.utcnow()
-    )
-    db.session.add(creation_interaction)
-
-    # Verificar si se incluye una compra inicial
-    valor_orden_total = data.get('valor_orden_total')
-    if valor_orden_total:
-        # Actualizar valores del cliente por la compra inicial
-        new_cliente.total_compras += 1
-        new_cliente.valor_medio_orden = (
-            valor_orden_total if new_cliente.total_compras == 1
-            else (new_cliente.valor_medio_orden * (new_cliente.total_compras - 1) + valor_orden_total) / new_cliente.total_compras
-        )
-        new_cliente.ultima_compra = datetime.utcnow()
-
-        # Guardar los cambios en el cliente
-        db.session.commit()
-
-        # Registrar interacción de compra inicial
-        purchase_interaction = InteraccionesCliente(
+        # Interacción de creación
+        db.session.add(InteraccionesCliente(
             cliente_id=new_cliente.id,
             usuario_id=user_id,
-            tipo_interaccion_id=2,  # Tipo predefinido para "Compra"
-            data_interaccion={
-                "accion": "Compra inicial",
-                "monto": valor_orden_total,
-                "estado": "completado"
-            },
+            tipo_interaccion_id=1,
+            data_interaccion={"accion": "Creación de cliente", "estado": "completado"},
             fecha_creacion=datetime.utcnow()
-        )
+        ))
 
-    # Confirmar todos los cambios en la base de datos
-    db.session.commit()
+        # Compra inicial (opcional)
+        valor_orden_total = data.get('valor_orden_total')
+        if valor_orden_total:
+            new_cliente.total_compras += 1
+            new_cliente.valor_medio_orden = valor_orden_total  # 1ª compra: promedio = monto
+            new_cliente.ultima_compra = datetime.utcnow()
 
-    return jsonify({
-        "message": "Cliente creado exitosamente",
-        "cliente_id": new_cliente.id,
-        "nombre": new_cliente.nombre,
-        "email": new_cliente.email,
-        "ultima_compra": new_cliente.ultima_compra
-    }), 201
+            db.session.add(InteraccionesCliente(   # ← AHORA SÍ se agrega
+                cliente_id=new_cliente.id,
+                usuario_id=user_id,
+                tipo_interaccion_id=2,
+                data_interaccion={
+                    "accion": "Compra inicial",
+                    "monto": valor_orden_total,
+                    "estado": "completado"
+                },
+                fecha_creacion=datetime.utcnow()
+            ))
+
+        db.session.commit()  # ← un solo commit
+
+        # Procesos pesados DESPUÉS del commit (si fallan, el cliente ya existe)
+        update_metrics(new_cliente)
+        assign_segments_to_customers(new_cliente.id)
+        generate_recommendations(new_cliente.id)
+
+        return jsonify({
+            "message": "Cliente creado exitosamente",
+            "cliente_id": new_cliente.id,
+            "nombre": new_cliente.nombre,
+            "email": new_cliente.email,
+            "ultima_compra": new_cliente.ultima_compra.isoformat() if new_cliente.ultima_compra else None
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Error al crear cliente: {str(e)}"}), 500
 
 
 # Obtener clientes
@@ -234,7 +223,7 @@ def update_customer(customer_id):
             assign_segments_to_customers(customer_id)
 
             # Predecir churn para este cliente
-            churn_prediction = predict_churn(customer_id)
+            churn_prediction = predict_churn_for_customer(customer_id)
 
             #
             generate_recommendations(customer_id)
@@ -302,6 +291,9 @@ def delete_customer(customer_id):
             fecha_creacion=datetime.utcnow()
         )
         db.session.add(deletion_interaction)
+
+        # Eliminar predicciones relacionadas  ← NUEVO
+        Prediccion.query.filter_by(cliente_id=customer_id).delete()
 
         # Eliminar métricas relacionadas
         MetricasHistoricas.query.filter_by(cliente_id=customer_id).delete()

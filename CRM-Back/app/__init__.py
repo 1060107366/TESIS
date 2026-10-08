@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
 from flask import Flask
 from flask import request, make_response
@@ -18,7 +21,7 @@ def create_app():
     
     app.config.from_object('app.config.Config')
 
-    frontend_url = os.getenv('FRONTEND_URL')
+    frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
     # Configuración de CORS
     cors_config = {
@@ -27,7 +30,7 @@ def create_app():
         "allow_headers": ["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
         "supports_credentials": True,
         "expose_headers": ["Content-Range", "X-Content-Range"],
-        "max_age": 600  # Tiempo máximo de cache para preflight requests
+        "max_age": 600
     }
 
     # Inicializar CORS con la configuración
@@ -35,7 +38,7 @@ def create_app():
         r"/auth/*": cors_config,
         r"/customer/*": cors_config,
         r"/predictions/*": cors_config,
-        r"/segments/*": cors_config,
+        r"/recomendaciones/*": cors_config,   # ← corregido (decía /segments/*)
         r"/trends/*": cors_config
     })
 
