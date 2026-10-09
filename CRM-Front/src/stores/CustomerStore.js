@@ -20,13 +20,12 @@ export const useCustomerStore = create((set) => ({
   fetchCustomers: async () => {
     set({ isLoading: true, error: null });
     try {
-      const customers = await customerApiService.getCustomers();
+      const response = await customerApiService.getCustomers();
+      // ✅ CORRECCIÓN: Extraer el array 'clientes' de la respuesta
+      const customers = response.clientes || []; 
       set({ customers, isLoading: false });
     } catch (error) {
-      set({
-        error: error.message || "Error al cargar los clientes",
-        isLoading: false,
-      });
+      set({ error: error.message || "Error al cargar los clientes", isLoading: false, });
     }
   },
 
