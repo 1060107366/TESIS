@@ -1,18 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  User,
-  Calendar,
-  DollarSign,
-  TrendingUp,
-  AlertTriangle,
-  MessageSquare,
-  ChevronLeft,
-  ArrowUpRight,
-  History,
-  Activity,
-} from "lucide-react";
+import {Edit2, User, Calendar, DollarSign, TrendingUp, AlertTriangle, MessageSquare, ChevronLeft, ArrowUpRight, History, Activity } from "lucide-react";
 import { useCustomerStore } from "../../stores/CustomerStore.js";
 
 const CustomerDetail = () => {
