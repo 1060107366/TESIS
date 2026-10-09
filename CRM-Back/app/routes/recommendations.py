@@ -1,19 +1,26 @@
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.recomendaciones import Recomendaciones
+from app.models.interacciones_cliente import InteraccionesCliente
 
 recommendations_bp = Blueprint('recomendaciones', __name__)
+
 
 @recommendations_bp.route('/<int:customer_id>', methods=['GET'])
 @jwt_required()
 def get_recommendations(customer_id):
-    """
-    Obtiene las recomendaciones activas de un cliente específico.
-    """
     user_id = get_jwt_identity()
 
-    # Verificar que el cliente pertenece al usuario
-    recommendations = Recomendaciones.query.filter_by(cliente_id=customer_id, aplicada=False).all()
+    # Verificación de propiedad (IDOR fix)
+    owns = InteraccionesCliente.query.filter_by(
+        cliente_id=customer_id, usuario_id=user_id
+    ).first()
+    if not owns:
+        return jsonify({"error": "No tienes permiso para ver este cliente"}), 403
+
+    recommendations = Recomendaciones.query.filter_by(
+        cliente_id=customer_id, aplicada=False
+    ).all()
 
     if not recommendations:
         return jsonify({"message": "No se encontraron recomendaciones para este cliente"}), 404

@@ -3,10 +3,11 @@ from datetime import datetime
 
 
 class Customer(db.Model):
-    __tablename__ = "Clientes"
+    __tablename__ = "clientes"
 
     id = db.Column(db.Integer, primary_key=True)
-    segmento_id = db.Column(db.Integer, db.ForeignKey('Segmentos.id'))
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True)
+    segmento_id = db.Column(db.Integer, db.ForeignKey('segmentos.id'))
     nombre = db.Column(db.String(500), nullable=False)
     email = db.Column(db.String(500), nullable=False, unique=True)
     ultima_compra = db.Column(db.DateTime, nullable=True)
@@ -18,10 +19,12 @@ class Customer(db.Model):
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
     fecha_actualizacion = db.Column(db.DateTime, default=datetime.utcnow)
     telefono = db.Column(db.String(500), nullable=True)
-
+    # Columnas legacy conservadas para datos históricos
+    churn = db.Column(db.Boolean, nullable=True)
+    churn_value = db.Column(db.Numeric(10, 3), nullable=True)
     # Relaciones
-    interacciones = db.relationship('InteraccionesCliente', backref='Clientes')
-    metricas = db.relationship('MetricasHistoricas', backref='Clientes')
-    segmento = db.relationship('Segmento', backref='Clientes')
+    interacciones = db.relationship('InteraccionesCliente', backref='clientes')
+    metricas = db.relationship('MetricasHistoricas', backref='clientes')
+    segmento = db.relationship('Segmento', backref='clientes')
 
 

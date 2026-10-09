@@ -68,13 +68,11 @@ def login():
         return jsonify({"message": "Se requieren 'email' y 'contrasena'"}), 400
 
     # Buscar usuario por email
-    user = User.query.filter_by(email=data['email']).first()
-    if not user:
-        return jsonify({"message": "Usuario no encontrado"}), 404
+    user = User.query.filter_by(email=data['email'].lower()).first()
 
-    # Verificar contraseña
-    if not check_password_hash(user.contrasena, data['contrasena']):
-        return jsonify({"message": "Contraseña incorrecta"}), 401
+    # Verificar credenciales
+    if not user or not user.check_password(data['contrasena']):
+        return jsonify({"message": "Credenciales incorrectas"}), 401
 
     # Generar token de acceso
     access_token = create_access_token(identity=str(user.id), expires_delta=timedelta(hours=3))

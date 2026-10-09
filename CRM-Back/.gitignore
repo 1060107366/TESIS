@@ -1,5 +1,13 @@
 .codeviz
 
+__pycache__/
+*.pyc
+.venv/
+.env
+migrations/
+*.ipynb
+app/ia/**/*.ipynb
+
 # Virtual environment
 .venv/
 .env/

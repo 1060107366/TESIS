@@ -1,25 +1,11 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react'; // O tu plugin de framework (vue, svelte, etc.)
+import tailwindcss from '@tailwindcss/vite';
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    proxy: {
-      "/auth": {
-        target: "http://localhost:5000",
-        changeOrigin: true,
-        secure: false,
-      },
-      "/api": {
-        target: "http://localhost:5000",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
-  test: {
-    environment: 'jsdom',
-    globals: true,
-  },
+  plugins: [
+    react(),
+    tailwindcss(), // ← Único plugin de Tailwind
+  ],
 });

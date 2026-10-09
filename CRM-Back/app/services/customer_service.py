@@ -2,7 +2,7 @@ from app.models.customer import Customer
 from app import db
 from datetime import datetime
 
-def create_customer(data):
+def create_customer(data, user_id):
     """
     Crea un nuevo cliente y lo guarda en la base de datos.
     """
@@ -12,6 +12,7 @@ def create_customer(data):
     valor_medio_orden = (valor_total_orden / total_compras) if total_compras > 0 else 0.0
 
     new_customer = Customer(
+        usuario_id=user_id,
         nombre=data['nombre'],
         email=data['email'],
         telefono=data['telefono'],

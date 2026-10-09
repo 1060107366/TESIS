@@ -3,7 +3,7 @@ from datetime import datetime
 
 class TiposInteraccion(db.Model):
 
-    __tablename__ = "Tipos_interaccion"
+    __tablename__ = "tipos_interaccion"
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(500), nullable=False)

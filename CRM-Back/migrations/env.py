@@ -51,6 +51,48 @@ def get_metadata():
     return target_db.metadata
 
 
+def include_object(object, name, type_, reflected, compare_to):
+    """
+    Filtra los objetos que Alembic debe considerar en autogenerate.
+
+    - Ignora tablas cuyo nombre empiece por 'backup_'.
+      Estas son copias manuales hechas con:
+          CREATE TABLE backup_<tabla>_<fecha> AS SELECT * FROM <tabla>;
+      No forman parte del esquema del proyecto y no deben aparecer
+      en las migraciones.
+
+    - Si se ignora una tabla, también se ignoran sus índices,
+      constraints, foreign keys y columnas asociados, para evitar
+      migraciones parciales que intenten tocar una tabla inexistente
+      para Alembic.
+
+    Devuelve True para incluir el objeto, False para ignorarlo.
+    """
+    # 1. Ignorar la tabla de control de Alembic (siempre)
+    if type_ == "table" and name == "alembic_version":
+        return False
+
+    # 2. Ignorar tablas backup_* explícitamente
+    if type_ == "table" and name and name.startswith("backup_"):
+        logger.info(f"[include_object] Ignorando tabla de respaldo: {name}")
+        return False
+
+    # 3. Ignorar índices, constraints y FKs que pertenezcan a una tabla backup_*
+    if type_ in ("index", "unique_constraint", "foreign_key_constraint") \
+            and hasattr(object, "table"):
+        table_name = getattr(object.table, "name", None)
+        if table_name and table_name.startswith("backup_"):
+            return False
+
+    # 4. Ignorar columnas que pertenezcan a una tabla backup_*
+    if type_ == "column" and hasattr(object, "table"):
+        table_name = getattr(object.table, "name", None)
+        if table_name and table_name.startswith("backup_"):
+            return False
+
+    return True
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -64,9 +106,16 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(
-        url=url, target_metadata=get_metadata(), literal_binds=True
-    )
+
+    # Opciones comunes para offline mode
+    offline_kwargs = {
+        "url": url,
+        "target_metadata": get_metadata(),
+        "literal_binds": True,
+        "include_object": include_object,
+    }
+
+    context.configure(**offline_kwargs)
 
     with context.begin_transaction():
         context.run_migrations()
@@ -91,8 +140,14 @@ def run_migrations_online():
                 logger.info('No changes in schema detected.')
 
     conf_args = current_app.extensions['migrate'].configure_args
+
+    # Añadir process_revision_directives solo si no viene ya configurado
     if conf_args.get("process_revision_directives") is None:
         conf_args["process_revision_directives"] = process_revision_directives
+
+    # Añadir include_object solo si no viene ya configurado
+    if conf_args.get("include_object") is None:
+        conf_args["include_object"] = include_object
 
     connectable = get_engine()
 

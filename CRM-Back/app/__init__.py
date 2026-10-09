@@ -52,7 +52,7 @@ def create_app():
     from app.routes.auth import auth_bp
     from app.routes.customer import customer_bp
     from app.routes.predictions import predictions_bp
-    from app.routes.recommedations import recommendations_bp
+    from app.routes.recommendations import recommendations_bp
     from app.routes.trends import trends_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')

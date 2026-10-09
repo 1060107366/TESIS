@@ -33,7 +33,7 @@ def create_customer_endpoint():
         return jsonify({"error": f"Faltan campos requeridos: {', '.join(missing_fields)}"}), 400
 
     try:
-        new_cliente = create_customer(data)
+        new_cliente = create_customer(data, user_id)  # Crear cliente usando el servicio
 
         # Interacción de creación
         db.session.add(InteraccionesCliente(
@@ -99,7 +99,7 @@ def get_customers():
     customer_ids = [customer_id[0] for customer_id in customer_ids]
 
     # Buscar los clientes correspondientes
-    customers = Customer.query.filter(Customer.id.in_(customer_ids)).all()
+    customers = Customer.query.filter_by(usuario_id=user_id).all()
 
     # Verificar si hay clientes
     if not customers:
@@ -148,7 +148,7 @@ def update_customer(customer_id):
         return jsonify({"error": "No tienes permiso para actualizar este cliente"}), 403
 
     # Buscar el cliente
-    customer = Customer.query.get(customer_id)
+    customer = Customer.query.filter_by(id=customer_id, usuario_id=user_id).first()
     if not customer:
         return jsonify({"error": "Cliente no encontrado"}), 404
 
@@ -278,7 +278,7 @@ def delete_customer(customer_id):
         return jsonify({"error": "No tienes permiso para eliminar este cliente"}), 403
 
     # Buscar el cliente
-    customer = Customer.query.get(customer_id)
+    customer = Customer.query.filter_by(id=customer_id, usuario_id=user_id).first()
     if not customer:
         return jsonify({"error": "Cliente no encontrado"}), 404
 
@@ -334,7 +334,7 @@ def get_customer_by_id(customer_id):
         return jsonify({"error": "No tienes permiso para ver este cliente"}), 403
 
     # Buscar el cliente
-    customer = Customer.query.get(customer_id)
+    customer = Customer.query.filter_by(id=customer_id, usuario_id=user_id).first()
     if not customer:
         return jsonify({"error": "Cliente no encontrado"}), 404
 

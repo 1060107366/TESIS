@@ -2,7 +2,7 @@ from app import db
 from datetime import datetime
 
 class Segmento(db.Model):
-    __tablename__ = 'Segmentos'
+    __tablename__ = 'segmentos'
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(500), nullable=False)
