@@ -35,15 +35,17 @@ def calculate_average_order_value(total_compras, suma_total_compras):
 # Calcular el Customer Lifetime Value (CLV)
 def calculate_clv(valor_medio_orden, total_compras, fecha_creacion):
     """
-    CLV histórico normalizado: valor promedio generado por el cliente por mes de vida.
-    Evita división por cero para clientes creados el mismo día.
+    CLV histórico normalizado: valor mensual promedio generado por el cliente.
+    Normaliza fechas naive (MySQL DATETIME) para evitar el crash naive vs aware.
     """
+    if fecha_creacion is not None and fecha_creacion.tzinfo is None:
+        fecha_creacion = fecha_creacion.replace(tzinfo=timezone.utc)
+
     dias_vida = (datetime.now(timezone.utc) - fecha_creacion).days
     meses_vida = max(dias_vida, 1) / 30  # mínimo 1 "mes" para clientes nuevos
 
     total_historico = valor_medio_orden * total_compras
-    clv_mensual = total_historico / meses_vida
-    return round(clv_mensual, 2)
+    return round(total_historico / meses_vida, 2)
 
 
 # Guardar métricas en la tabla MetricasHistoricas

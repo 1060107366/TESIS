@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
@@ -84,7 +85,7 @@ def get_clientes_por_segmento():
 
         segmentos = db.session.query(
             Segmento.nombre,
-            db.func.count(distinct(Customer.id)).label('cantidad')
+            func.count(distinct(Customer.id)).label('cantidad')
         ).join(
             Customer,
             Customer.segmento_id == Segmento.id

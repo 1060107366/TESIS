@@ -1,13 +1,14 @@
-from flask import Blueprint, json, request, jsonify
+import json
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
+from app.routes.predictions import predict_churn_for_customer
 from app.models.predicciones import Prediccion
 from app.models.customer import Customer
 from app.models.metricas_historicas import MetricasHistoricas
 from app.models.recomendaciones import Recomendaciones
 from app.models.tipo_interaccion import TiposInteraccion
 from app.models.interacciones_cliente import InteraccionesCliente
-from app.routes.predictions import predict_churn_for_customer
 from app.services.customer_service import create_customer
 from app.services.recommendation_service import generate_recommendations
 from app.services.metrics_service import calculate_purchase_frequency, update_metrics
