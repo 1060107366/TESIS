@@ -18,7 +18,7 @@ import { isAuthenticated } from "./services/auth/authService.js";
 function App() {
   return (
     <Router>
-      <Routes>
+      <Routes>        
         {/* Rutas públicas */}
         <Route
           path="/login"
@@ -55,6 +55,7 @@ function App() {
             <Route index element={<CustomerList />} />
             <Route path="new" element={<CreateCustomer />} />
             <Route path=":id" element={<CustomerDetail />} />
+            <Route path="/customers/:id/edit" element={<CreateCustomer />} />
           </Route>
 
           {/* Análisis */}
