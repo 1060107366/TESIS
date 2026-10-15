@@ -111,7 +111,7 @@ const CustomerDetail = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <MetricCard
           title="Total Compras"
-          value={`$${selectedCustomer.total_compras.toFixed(2)}`}
+          value={selectedCustomer.total_compras}
           icon={DollarSign}
           trend={5.2}
         />
