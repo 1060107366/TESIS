@@ -13,7 +13,7 @@ import {
 } from "recharts";
 
 const Analysis = () => {
-  const { analysisData, isLoading, error, fetchAnalysisData } =
+  const { analysisData, isLoading, error, fetchAnalysisData, updatePredictions } =
     useAnalysisStore();
 
   useEffect(() => {
@@ -56,11 +56,25 @@ const Analysis = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">Análisis</h1>
+        <button
+          onClick={() => fetchAnalysisData()}
+          disabled={isLoading}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          Actualizar datos
+        </button>
+        <button
+          onClick={() => updatePredictions().then(fetchAnalysisData)}
+          disabled={isLoading}
+          className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+        >
+          Ejecutar predicciones
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
-          title="Predicci�n de Abandono"
+          title="Predicción de Abandono"
           value={`${Object.values(analysisData?.metricas_principales?.churn_promedio || {})[0] ?? "N/A"}`}
           subtitle="Promedio de churn (>0.50)"
           icon={TrendingUp}
@@ -73,7 +87,7 @@ const Analysis = () => {
         />
         <StatCard
           title="Rendimiento"
-          value="N/A"
+          value="Pendiente de evaluar"
           subtitle="Precisión del modelo"
           icon={BarChart2}
         />
@@ -114,29 +128,21 @@ const Analysis = () => {
           </h2>
           <div className="space-y-4">
             {Array.isArray(analysisData?.segmentos) && analysisData.segmentos.map((segmento, idx) => (
-              <div key={segmento.id ?? idx} className="flex items-center">
+              <div key={segmento?.name ?? idx} className="flex items-center">
                 <div className="flex-1">
                   <div className="flex justify-between mb-1">
                     <span className="text-sm font-medium text-gray-700">
-                      {segmento.nombre}
+                      {segmento?.name ?? `Segmento ${idx + 1}`}
                     </span>
                     <span className="text-sm font-medium text-gray-700">
-                      {segmento.porcentaje}%
+                      {segmento?.value ?? 0} clientes
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-blue-600 h-2 rounded-full"
-                      style={{ width: `${segmento.porcentaje}%` }}
+                      style={{ width: `${Math.min(100, (segmento?.value || 0) * 10)}%` }}
                     />
-                  </div>
-                  <div className="flex justify-between mt-1">
-                    <span className="text-xs text-gray-500">
-                      {segmento.total_clientes} clientes
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      ${Number(segmento?.valor_promedio || 0).toLocaleString()} valor promedio
-                    </span>
                   </div>
                 </div>
               </div>
