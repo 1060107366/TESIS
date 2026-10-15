@@ -61,19 +61,19 @@ const Analysis = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
           title="Predicción de Abandono"
-          value={`${analysisData?.metricas_principales.clientes_riesgo} clientes`}
-          subtitle="En riesgo alto de abandono"
+          value={`${analysisData?.metricas_principales?.churn_promedio ?? 0}`}
+          subtitle="Promedio de churn"
           icon={TrendingUp}
         />
         <StatCard
           title="Segmentación"
-          value={`${analysisData?.metricas_principales.total_segmentos} Segmentos`}
+          value={`${analysisData?.segmentos?.length ?? 0} Segmentos`}
           subtitle="Identificados automáticamente"
           icon={Users}
         />
         <StatCard
           title="Rendimiento"
-          value={`${analysisData?.metricas_principales.precision_modelo}%`}
+          value="N/A"
           subtitle="Precisión del modelo"
           icon={BarChart2}
         />
@@ -113,8 +113,8 @@ const Analysis = () => {
             Distribución por Segmento
           </h2>
           <div className="space-y-4">
-            {analysisData?.segmentos.map((segmento) => (
-              <div key={segmento.id} className="flex items-center">
+            {Array.isArray(analysisData?.segmentos) && analysisData.segmentos.map((segmento, idx) => (
+              <div key={segmento.id ?? idx} className="flex items-center">
                 <div className="flex-1">
                   <div className="flex justify-between mb-1">
                     <span className="text-sm font-medium text-gray-700">
