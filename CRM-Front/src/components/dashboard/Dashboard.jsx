@@ -106,10 +106,10 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trends}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="valor" fill="#3B82F6" />
+                <Bar dataKey="value" fill="#3B82F6" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -124,10 +124,10 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trends}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="valor" fill="#10B981" />
+                <Bar dataKey="value" fill="#10B981" />
               </BarChart>
             </ResponsiveContainer>
           </div>
