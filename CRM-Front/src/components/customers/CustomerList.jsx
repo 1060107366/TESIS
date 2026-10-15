@@ -162,8 +162,16 @@ const CustomerList = () => {
               onClick={() => setSelectedSegment(active ? null : Number(id))}
               className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
                 active
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                  ? id === "0" ? "bg-slate-600 text-white border-slate-600"
+                    : id === "1" ? "bg-red-600 text-white border-red-600"
+                    : id === "2" ? "bg-amber-600 text-white border-amber-600"
+                    : id === "3" ? "bg-green-600 text-white border-green-600"
+                    : "bg-indigo-600 text-white border-indigo-600"
+                  : id === "0" ? "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
+                    : id === "1" ? "bg-red-50 text-red-700 border-red-300 hover:bg-red-100"
+                    : id === "2" ? "bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100"
+                    : id === "3" ? "bg-green-50 text-green-700 border-green-300 hover:bg-green-100"
+                    : "bg-indigo-50 text-indigo-700 border-indigo-300 hover:bg-indigo-100"
               }`}
             >
               {labels[id] || `Segmento ${id}`}: {count}
