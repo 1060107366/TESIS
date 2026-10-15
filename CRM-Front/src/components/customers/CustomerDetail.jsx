@@ -7,7 +7,7 @@ import { useCustomerStore } from "../../stores/CustomerStore.js";
 const CustomerDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { selectedCustomer, isLoading, error, fetchCustomerDetails } =
+  const { selectedCustomer, isLoading, error, fetchCustomerDetails, registerPurchase } =
     useCustomerStore();
 
   useEffect(() => {
@@ -88,6 +88,21 @@ const CustomerDetail = () => {
           </div>
         </div>
         <div className="flex space-x-3">
+          <button
+            onClick={async () => {
+              const monto = window.prompt("Monto de la compra:");
+              if (!monto) return;
+              try {
+                await registerPurchase(Number(id), { suma_total_compras: Number(monto), fecha: new Date().toISOString() });
+                await fetchCustomerDetails(Number(id));
+              } catch {
+                alert("No se pudo registrar la compra");
+              }
+            }}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            Registrar Compra
+          </button>
           <button
             onClick={() => navigate(`/customers/${id}/edit`)}
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
