@@ -42,7 +42,7 @@ def calculate_clv(valor_medio_orden, total_compras, fecha_creacion):
         fecha_creacion = fecha_creacion.replace(tzinfo=timezone.utc)
 
     dias_vida = (datetime.now(timezone.utc) - fecha_creacion).days
-    meses_vida = max(dias_vida, 1) / 30  # mínimo 1 "mes" para clientes nuevos
+    meses_vida = max(dias_vida, 30) / 30  # mínimo 1 "mes" para clientes nuevos
 
     total_historico = valor_medio_orden * total_compras
     return round(total_historico / meses_vida, 2)
