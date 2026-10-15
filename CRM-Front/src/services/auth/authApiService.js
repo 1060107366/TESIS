@@ -1,7 +1,6 @@
 import { fetchWithAuth, setToken, removeToken } from "./authService.js";
 
 export const authApiService = {
-  // Registro de usuario
   async register(userData) {
     const response = await fetchWithAuth("/auth/register", {
       method: "POST",
@@ -10,7 +9,6 @@ export const authApiService = {
     return response;
   },
 
-  // Inicio de sesión
   async login(credentials) {
     try {
       const response = await fetchWithAuth("/auth/login", {
@@ -24,19 +22,13 @@ export const authApiService = {
 
       return response;
     } catch (error) {
-      throw new Error(error.message || "Error en el inicio de sesión");
+      throw new Error(error.message || "Error en el inicio de sesion");
     }
   },
 
-  // Cerrar sesión
+  // Backend no expone /auth/logout; se limpia sesion local
   async logout() {
-    try {
-      await fetchWithAuth("/auth/logout", {
-        method: "POST",
-      });
-    } finally {
-      removeToken();
-    }
+    removeToken();
   },
 
   async updateProfile(userData) {
@@ -46,10 +38,9 @@ export const authApiService = {
     });
   },
 
-  async userInfo(userData) {
+  async userInfo() {
     return await fetchWithAuth("/auth/me", {
       method: "GET",
-      body: JSON.stringify(userData),
     });
   },
 };
