@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {Edit2, User, Calendar, DollarSign, TrendingUp, AlertTriangle, MessageSquare, ChevronLeft, ArrowUpRight, History, Activity } from "lucide-react";
+import { useCustomerStore } from "../../stores/CustomerStore.js";
 import { formatCOP } from "../../utils/formatCurrency.js";
 
 const CustomerDetail = () => {
