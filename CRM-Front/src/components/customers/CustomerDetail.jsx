@@ -287,7 +287,15 @@ const CustomerDetail = () => {
           <div className="space-y-3">
             {selectedCustomer.metricas_historicas.map((metric, idx) => (
               <div key={idx} className="flex justify-between text-sm">
-                <span className="text-gray-600">{metric?.tipo_metrica ?? "Métrica"}</span>
+                <span className="text-gray-600">
+  {metric?.tipo_metrica === "frecuencia_compra"
+    ? "Frecuencia"
+    : metric?.tipo_metrica === "valor_medio_orden"
+    ? "Ticket medio"
+    : metric?.tipo_metrica === "valor_cliente"
+    ? "CLV mensual"
+    : metric?.tipo_metrica ?? "Métrica"}
+</span>
                 <span className="font-medium text-gray-900">
                   {metric?.valor ?? "-"}
                 </span>
