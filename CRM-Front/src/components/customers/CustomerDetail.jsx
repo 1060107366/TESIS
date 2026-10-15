@@ -205,7 +205,7 @@ const CustomerDetail = () => {
                 </span>
               </div>
               <span className="text-sm font-medium text-gray-900">
-                5 compras
+                {selectedCustomer?.total_compras ?? 0}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -215,7 +215,7 @@ const CustomerDetail = () => {
                   Valor promedio 3 meses
                 </span>
               </div>
-              <span className="text-sm font-medium text-gray-900">$345.00</span>
+              <span className="text-sm font-medium text-gray-900">{formatCOP(selectedCustomer?.valor_medio_orden ?? 0)}</span>
             </div>
           </div>
         </div>
