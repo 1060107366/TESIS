@@ -281,6 +281,21 @@ const CustomerDetail = () => {
           </div>
         </div>
       )}
+      {Array.isArray(selectedCustomer?.metricas_historicas) && selectedCustomer.metricas_historicas.length > 0 && (
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-lg font-medium text-gray-900 mb-4">Métricas históricas</h2>
+          <div className="space-y-3">
+            {selectedCustomer.metricas_historicas.map((metric, idx) => (
+              <div key={idx} className="flex justify-between text-sm">
+                <span className="text-gray-600">{metric?.tipo_metrica ?? "Métrica"}</span>
+                <span className="font-medium text-gray-900">
+                  {metric?.valor ?? "-"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 

@@ -77,7 +77,40 @@ def get_global_valor_medio_orden():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@trends_bp.route('/global/clientes_por_segmento', methods=['GET'])
+@trends_bp.route('/global/actividad_mensual', methods=['GET'])
+@jwt_required()
+def get_global_actividad_mensual():
+    try:
+        user_id = get_jwt_identity()
+        from datetime import datetime, timedelta
+        from sqlalchemy import func, extract
+
+        # últimos 6 meses
+        six_months_ago = datetime.utcnow().replace(day=1) - timedelta(days=30*5)
+
+        results = db.session.query(
+            extract('year', InteraccionesCliente.fecha_creacion).label('anio'),
+            extract('month', InteraccionesCliente.fecha_creacion).label('mes'),
+            func.count(InteraccionesCliente.id).label('cantidad')
+        ).filter(
+            InteraccionesCliente.usuario_id == user_id,
+            InteraccionesCliente.fecha_creacion >= six_months_ago
+        ).group_by(
+            extract('year', InteraccionesCliente.fecha_creacion),
+            extract('month', InteraccionesCliente.fecha_creacion)
+        ).order_by(
+            extract('year', InteraccionesCliente.fecha_creacion),
+            extract('month', InteraccionesCliente.fecha_creacion)
+        ).all()
+
+        meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+        data = [{"month": f"{meses[int(r.mes)-1]} {int(r.anio)}", "value": int(r.cantidad)} for r in results]
+        if not data:
+            # fallback para que el gráfico no quede vacío
+            data = [{"month": datetime.utcnow().strftime('%b'), "value": 0}]
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 @jwt_required()
 def get_clientes_por_segmento():
     try:
