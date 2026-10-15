@@ -92,7 +92,7 @@ def assign_segments_to_customers(customer_id=None):
         # Calcular métricas necesarias
         customer_df['dias_ultima_compra'] = (current_date - customer_df['ultima_compra']).dt.days.fillna(365)
         customer_df['dias_como_cliente'] = (current_date - customer_df['fecha_creacion']).dt.days.fillna(1)
-        customer_df['frecuencia_compra'] = (customer_df['total_compras'] / (customer_df['dias_como_cliente'] / 30)).fillna(0)
+        customer_df['frecuencia_compra'] = (customer_df['total_compras'] / (customer_df['dias_como_cliente'] / 30)).replace([float('inf'), float('-inf')], 0).fillna(0)
 
         # Separar clientes nuevos/sin compras
         new_customers = customer_df[
@@ -120,10 +120,10 @@ def assign_segments_to_customers(customer_id=None):
                 2: 3   # Alto valor
             }
 
-            for i, row in regular_customers.iterrows():
+            for pos, (i, row) in enumerate(regular_customers.iterrows()):
                 updates.append({
                     'id': row['id'],
-                    'segmento_id': segment_map[predictions[i]]
+                    'segmento_id': segment_map[predictions[pos]]
                 })
 
         # Asignar segmento 4 a clientes nuevos/sin compras
