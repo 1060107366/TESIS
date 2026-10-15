@@ -32,6 +32,14 @@ export const useDashboardStore = create((set) => ({
       let ownCustomers = [];
       try { recentActivity = await customerApiService.getRecentActivity(); } catch { recentActivity = []; }
       try { bySegment = await trendsApiService.getClientsBySegment(); } catch { bySegment = []; }
+      if (!Array.isArray(bySegment) || bySegment.length === 0) {
+        try {
+          await predictionApiService.segmentClients();
+          bySegment = await trendsApiService.getClientsBySegment();
+        } catch {
+          bySegment = [];
+        }
+      }
       try { monthlyActivity = await trendsApiService.getGlobalMonthlyActivity(); } catch { monthlyActivity = []; }
       try { churnAvg = await predictionApiService.getGlobalChurnAvg(); } catch { churnAvg = null; }
       try {
