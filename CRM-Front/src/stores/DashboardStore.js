@@ -11,6 +11,7 @@ export const useDashboardStore = create((set) => ({
   },
   recentActivity: [],
   trends: [],
+  segmentData: [],
   isLoading: false,
   error: null,
 
@@ -19,6 +20,7 @@ export const useDashboardStore = create((set) => ({
   updateMetrics: (metrics) => set({ metrics, isLoading: false }),
   updateActivity: (recentActivity) => set({ recentActivity }),
   updateTrends: (trends) => set({ trends }),
+  updateSegments: (segmentData) => set({ segmentData }),
 
   fetchDashboardData: async () => {
     set({ isLoading: true, error: null });
@@ -29,9 +31,11 @@ export const useDashboardStore = create((set) => ({
       } catch {
         recentActivity = [];
       }
-      const [churnAvg, bySegment] = await Promise.all([
+
+      const [churnAvg, bySegment, monthlyActivity] = await Promise.all([
         predictionApiService.getGlobalChurnAvg(),
         trendsApiService.getClientsBySegment(),
+        trendsApiService.getGlobalMonthlyActivity(),
       ]);
 
       const segmentTotal = Array.isArray(bySegment)
@@ -51,7 +55,8 @@ export const useDashboardStore = create((set) => ({
         recentActivity: Array.isArray(recentActivity)
           ? recentActivity
           : (recentActivity?.actividad ?? []),
-        trends: Array.isArray(bySegment) ? bySegment : [],
+        trends: Array.isArray(monthlyActivity) ? monthlyActivity : [],
+        segmentData: Array.isArray(bySegment) ? bySegment : [],
         isLoading: false,
       });
     } catch (error) {

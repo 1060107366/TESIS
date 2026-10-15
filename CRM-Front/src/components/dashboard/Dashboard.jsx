@@ -17,6 +17,7 @@ const Dashboard = () => {
     metrics,
     recentActivity,
     trends,
+    segmentData,
     isLoading,
     error,
     fetchDashboardData,
@@ -106,7 +107,7 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trends}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="value" fill="#3B82F6" />
@@ -122,7 +123,7 @@ const Dashboard = () => {
           </h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={trends}>
+              <BarChart data={segmentData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
