@@ -23,8 +23,13 @@ export const useDashboardStore = create((set) => ({
   fetchDashboardData: async () => {
     set({ isLoading: true, error: null });
     try {
-      const [recentActivity, churnAvg, bySegment] = await Promise.all([
-        customerApiService.getRecentActivity(),
+      let recentActivity = [];
+      try {
+        recentActivity = await customerApiService.getRecentActivity();
+      } catch {
+        recentActivity = [];
+      }
+      const [churnAvg, bySegment] = await Promise.all([
         predictionApiService.getGlobalChurnAvg(),
         trendsApiService.getClientsBySegment(),
       ]);
