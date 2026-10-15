@@ -26,17 +26,18 @@ export const useDashboardStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       let recentActivity = [];
+      let bySegment = [];
+      let monthlyActivity = [];
+      let churnAvg = null;
+      let ownCustomers = [];
+      try { recentActivity = await customerApiService.getRecentActivity(); } catch { recentActivity = []; }
+      try { bySegment = await trendsApiService.getClientsBySegment(); } catch { bySegment = []; }
+      try { monthlyActivity = await trendsApiService.getGlobalMonthlyActivity(); } catch { monthlyActivity = []; }
+      try { churnAvg = await predictionApiService.getGlobalChurnAvg(); } catch { churnAvg = null; }
       try {
-        recentActivity = await customerApiService.getRecentActivity();
-      } catch {
-        recentActivity = [];
-      }
-
-      const [churnAvg, bySegment, monthlyActivity] = await Promise.all([
-        predictionApiService.getGlobalChurnAvg(),
-        trendsApiService.getClientsBySegment(),
-        trendsApiService.getGlobalMonthlyActivity(),
-      ]);
+        const customers = await customerApiService.getCustomers();
+        ownCustomers = Array.isArray(customers?.clientes) ? customers.clientes : Array.isArray(customers) ? customers : [];
+      } catch { ownCustomers = []; }
 
       const segmentTotal = Array.isArray(bySegment)
         ? bySegment.reduce((acc, item) => acc + (Number(item?.value) || 0), 0)
@@ -48,7 +49,7 @@ export const useDashboardStore = create((set) => ({
 
       set({
         metrics: {
-          totalClients: segmentTotal,
+          totalClients: ownCustomers.length,
           churnRate: String(churnValue),
           segments: segmentCount,
         },
