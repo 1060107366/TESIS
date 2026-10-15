@@ -184,8 +184,8 @@ const CustomerList = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredCustomers.length > 0 ? (
-                filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-gray-50">
+                filteredCustomers.map((customer, idx) => (
+                  <tr key={customer.id ?? idx} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div>
