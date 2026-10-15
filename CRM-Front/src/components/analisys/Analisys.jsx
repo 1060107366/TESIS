@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import { AlertTriangle, BarChart2, Users, TrendingUp } from "lucide-react";
 import { useAnalysisStore } from "../../stores/AnalisysStore";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -107,24 +107,13 @@ const Analysis = () => {
           </h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={analysisData?.tendencias || []}>
+              <BarChart data={(analysisData?.tendencias || []).slice(0, 5)}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="mes" />
+                <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="valor"
-                  stroke="#3B82F6"
-                  name="Valor"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="tasa_abandono"
-                  stroke="#EF4444"
-                  name="Tasa de Abandono"
-                />
-              </LineChart>
+                <Bar dataKey="value" fill="#3B82F6" name="Actividad mensual" />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
