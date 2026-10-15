@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {Edit2, User, Calendar, DollarSign, TrendingUp, AlertTriangle, MessageSquare, ChevronLeft, ArrowUpRight, History, Activity } from "lucide-react";
-import { useCustomerStore } from "../../stores/CustomerStore.js";
+import { formatCOP } from "../../utils/formatCurrency.js";
 
 const CustomerDetail = () => {
   const { id } = useParams();
@@ -122,13 +122,13 @@ const CustomerDetail = () => {
         />
         <MetricCard
           title="Valor Promedio Orden"
-          value={`$${selectedCustomer.valor_medio_orden.toFixed(2)}`}
+          value={formatCOP(selectedCustomer.valor_medio_orden)}
           icon={TrendingUp}
           trend={-2.1}
         />
         <MetricCard
           title="Valor Cliente"
-          value={`$${selectedCustomer.valor_cliente.toFixed(2)}`}
+          value={formatCOP(selectedCustomer.valor_cliente)}
           icon={User}
           color="green"
         />
