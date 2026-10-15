@@ -16,21 +16,24 @@ export const useAnalysisStore = create((set) => ({
   fetchAnalysisData: async () => {
     set({ isLoading: true, error: null });
     try {
-      const [churnAvg, clientsBySegment, purchaseFreq] = await Promise.all([
+      const [churnAvg, clientsBySegment, monthlyActivity] = await Promise.all([
         predictionApiService.getGlobalChurnAvg(),
         trendsApiService.getClientsBySegment(),
-        trendsApiService.getGlobalPurchaseFrequency(),
+        trendsApiService.getGlobalMonthlyActivity(),
       ]);
 
       set({
         analysisData: {
           metricas_principales: {
             churn_promedio: churnAvg,
-            compra_frecuencia: purchaseFreq,
+            compra_frecuencia: monthlyActivity,
           },
           segmentos: Array.isArray(clientsBySegment)
             ? clientsBySegment
             : (clientsBySegment?.segmentos ?? []),
+          tendencias: Array.isArray(monthlyActivity)
+            ? monthlyActivity
+            : (monthlyActivity?.tendencias ?? []),
         },
         isLoading: false,
         error: null,

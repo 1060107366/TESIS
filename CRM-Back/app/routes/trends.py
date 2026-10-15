@@ -111,6 +111,7 @@ def get_global_actividad_mensual():
         return jsonify(data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@trends_bp.route('/global/clientes_por_segmento', methods=['GET'])
 @jwt_required()
 def get_clientes_por_segmento():
     try:

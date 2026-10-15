@@ -205,7 +205,7 @@ const CustomerDetail = () => {
                 </span>
               </div>
               <span className="text-sm font-medium text-gray-900">
-                5 compras
+                {selectedCustomer?.total_compras ?? 0}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -215,7 +215,7 @@ const CustomerDetail = () => {
                   Valor promedio 3 meses
                 </span>
               </div>
-              <span className="text-sm font-medium text-gray-900">$345.00</span>
+              <span className="text-sm font-medium text-gray-900">{formatCOP(selectedCustomer?.valor_medio_orden ?? 0)}</span>
             </div>
           </div>
         </div>
@@ -287,7 +287,15 @@ const CustomerDetail = () => {
           <div className="space-y-3">
             {selectedCustomer.metricas_historicas.map((metric, idx) => (
               <div key={idx} className="flex justify-between text-sm">
-                <span className="text-gray-600">{metric?.tipo_metrica ?? "Métrica"}</span>
+                <span className="text-gray-600">
+  {metric?.tipo_metrica === "frecuencia_compra"
+    ? "Frecuencia"
+    : metric?.tipo_metrica === "valor_medio_orden"
+    ? "Ticket medio"
+    : metric?.tipo_metrica === "valor_cliente"
+    ? "CLV mensual"
+    : metric?.tipo_metrica ?? "Métrica"}
+</span>
                 <span className="font-medium text-gray-900">
                   {metric?.valor ?? "-"}
                 </span>

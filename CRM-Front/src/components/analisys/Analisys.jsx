@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import { AlertTriangle, BarChart2, Users, TrendingUp } from "lucide-react";
 import { useAnalysisStore } from "../../stores/AnalisysStore";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -57,13 +57,6 @@ const Analysis = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">Análisis</h1>
         <button
-          onClick={() => fetchAnalysisData()}
-          disabled={isLoading}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-        >
-          Actualizar datos
-        </button>
-        <button
           onClick={() => updatePredictions().then(fetchAnalysisData)}
           disabled={isLoading}
           className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
@@ -96,28 +89,17 @@ const Analysis = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">
-            Tendencias Temporales
+            Clientes por Segmento
           </h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={analysisData?.tendencias || []}>
+              <BarChart data={analysisData?.segmentos || []}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="mes" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="valor"
-                  stroke="#3B82F6"
-                  name="Valor"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="tasa_abandono"
-                  stroke="#EF4444"
-                  name="Tasa de Abandono"
-                />
-              </LineChart>
+                <Bar dataKey="value" fill="#3B82F6" name="Clientes" />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
