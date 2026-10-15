@@ -23,6 +23,7 @@ const CustomerList = () => {
   } = useCustomerStore();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSegment, setSelectedSegment] = useState(null);
   const [filteredCustomers, setFilteredCustomers] = useState([]);
 
   // Cargar clientes al montar el componente
@@ -42,11 +43,13 @@ const CustomerList = () => {
   useEffect(() => {
     const filtered = customers.filter(
       (customer) =>
-        customer.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        (selectedSegment === null ||
+          (customer.segmento_id ?? 0) === selectedSegment) &&
+        (customer.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          customer.email?.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredCustomers(filtered);
-  }, [customers, searchTerm]);
+  }, [customers, searchTerm, selectedSegment]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -134,6 +137,39 @@ const CustomerList = () => {
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Cliente
         </button>
+      </div>
+
+      {/* Segmentos */}
+      <div className="flex gap-2 flex-wrap">
+        {Object.entries(
+          customers.reduce((acc, c) => {
+            const id = c.segmento_id ?? 0;
+            acc[id] = (acc[id] || 0) + 1;
+            return acc;
+          }, {})
+        ).map(([id, count]) => {
+          const labels = {
+            0: "Sin segmento",
+            1: "Bajo valor",
+            2: "Medio valor",
+            3: "Alto valor",
+            4: "Nuevos",
+          };
+          const active = selectedSegment === Number(id);
+          return (
+            <button
+              key={id}
+              onClick={() => setSelectedSegment(active ? null : Number(id))}
+              className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                active
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              {labels[id] || `Segmento ${id}`}: {count}
+            </button>
+          );
+        })}
       </div>
 
       {/* Barra de búsqueda y filtros */}

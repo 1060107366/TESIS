@@ -121,6 +121,7 @@ def get_customers():
             "valor_medio_orden": float(customer.valor_medio_orden),
             "probabilidad_churn": float(customer.probabilidad_churn),
             "valor_cliente": float(customer.valor_cliente),
+            "segmento_id": customer.segmento_id,
         }
         for customer in customers
     ]
@@ -350,6 +351,7 @@ def get_customer_by_id(customer_id):
         "valor_medio_orden": float(customer.valor_medio_orden),
         "probabilidad_churn": float(customer.probabilidad_churn),
         "valor_cliente": float(customer.valor_cliente),
+        "segmento_id": customer.segmento_id,
     }), 200
 
 
