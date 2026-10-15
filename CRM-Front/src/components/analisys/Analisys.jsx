@@ -60,9 +60,9 @@ const Analysis = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard
-          title="Predicción de Abandono"
-          value={`${analysisData?.metricas_principales?.churn_promedio ?? 0}`}
-          subtitle="Promedio de churn"
+          title="Predicci�n de Abandono"
+          value={`${Object.values(analysisData?.metricas_principales?.churn_promedio || {})[0] ?? "N/A"}`}
+          subtitle="Promedio de churn (>0.50)"
           icon={TrendingUp}
         />
         <StatCard
