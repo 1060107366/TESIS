@@ -89,20 +89,22 @@ def get_global_actividad_mensual():
         six_months_ago = datetime.utcnow().replace(day=1) - timedelta(days=30*5)
 
         results = db.session.query(
-            func.date_format(InteraccionesCliente.fecha_creacion, '%b'),
-            func.count(InteraccionesCliente.id)
+            extract('year', InteraccionesCliente.fecha_creacion).label('anio'),
+            extract('month', InteraccionesCliente.fecha_creacion).label('mes'),
+            func.count(InteraccionesCliente.id).label('cantidad')
         ).filter(
             InteraccionesCliente.usuario_id == user_id,
             InteraccionesCliente.fecha_creacion >= six_months_ago
         ).group_by(
-            extract('month', InteraccionesCliente.fecha_creacion),
-            extract('year', InteraccionesCliente.fecha_creacion)
+            extract('year', InteraccionesCliente.fecha_creacion),
+            extract('month', InteraccionesCliente.fecha_creacion)
         ).order_by(
             extract('year', InteraccionesCliente.fecha_creacion),
             extract('month', InteraccionesCliente.fecha_creacion)
         ).all()
 
-        data = [{"month": r[0], "value": int(r[1])} for r in results]
+        meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+        data = [{"month": f"{meses[int(r.mes)-1]} {int(r.anio)}", "value": int(r.cantidad)} for r in results]
         if not data:
             # fallback para que el gráfico no quede vacío
             data = [{"month": datetime.utcnow().strftime('%b'), "value": 0}]
