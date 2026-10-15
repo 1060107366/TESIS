@@ -89,16 +89,16 @@ const Analysis = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">
-            Tendencias Temporales
+            Clientes por Segmento
           </h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={(analysisData?.tendencias || []).slice(0, 5)}>
+              <BarChart data={analysisData?.segmentos || []}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#3B82F6" name="Actividad mensual" />
+                <Bar dataKey="value" fill="#3B82F6" name="Clientes" />
               </BarChart>
             </ResponsiveContainer>
           </div>
