@@ -1,5 +1,12 @@
 """Carga de datos de prueba: 50 clientes por usuario."""
 import random
+import os
+import sys
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 from app import create_app
 from app import db
 from app.models.customer import Customer
@@ -14,10 +21,14 @@ with app.app_context():
     total = 0
     for (user_id,) in users:
         for i in range(50):
+            email = f"test{user_id}_{i}@example.com"
+            existing = Customer.query.filter_by(email=email).first()
+            if existing:
+                continue
             cliente = Customer(
                 usuario_id=user_id,
                 nombre=f"Cliente Test {user_id}_{i}",
-                email=f"test{user_id}_{i}@example.com",
+                email=email,
                 telefono=f"300{user_id}{i:04d}"[:10],
                 total_compras=0,
                 valor_medio_orden=0.0,
