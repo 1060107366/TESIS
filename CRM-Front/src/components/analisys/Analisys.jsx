@@ -135,7 +135,7 @@ const Analysis = () => {
                       {segmento.total_clientes} clientes
                     </span>
                     <span className="text-xs text-gray-500">
-                      ${segmento.valor_promedio.toLocaleString()} valor promedio
+                      ${Number(segmento?.valor_promedio || 0).toLocaleString()} valor promedio
                     </span>
                   </div>
                 </div>
