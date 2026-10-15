@@ -1,14 +1,17 @@
 /* eslint-disable react/prop-types */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {Edit2, User, Calendar, DollarSign, TrendingUp, AlertTriangle, MessageSquare, ChevronLeft, ArrowUpRight, History, Activity } from "lucide-react";
-import { useCustomerStore } from "../../stores/CustomerStore.js";
+import { formatCOP } from "../../utils/formatCurrency.js";
 
 const CustomerDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { selectedCustomer, isLoading, error, fetchCustomerDetails } =
+  const { selectedCustomer, isLoading, error, fetchCustomerDetails, registerPurchase } =
     useCustomerStore();
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [monto, setMonto] = useState("");
+  const [fechaCompra, setFechaCompra] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -89,6 +92,12 @@ const CustomerDetail = () => {
         </div>
         <div className="flex space-x-3">
           <button
+            onClick={() => setShowPurchaseModal(true)}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            Registrar Compra
+          </button>
+          <button
             onClick={() => navigate(`/customers/${id}/edit`)}
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
@@ -102,7 +111,7 @@ const CustomerDetail = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <MetricCard
           title="Total Compras"
-          value={`$${selectedCustomer.total_compras.toFixed(2)}`}
+          value={selectedCustomer.total_compras}
           icon={DollarSign}
           trend={5.2}
         />
@@ -113,13 +122,13 @@ const CustomerDetail = () => {
         />
         <MetricCard
           title="Valor Promedio Orden"
-          value={`$${selectedCustomer.valor_medio_orden.toFixed(2)}`}
+          value={formatCOP(selectedCustomer.valor_medio_orden)}
           icon={TrendingUp}
           trend={-2.1}
         />
         <MetricCard
           title="Valor Cliente"
-          value={`$${selectedCustomer.valor_cliente.toFixed(2)}`}
+          value={formatCOP(selectedCustomer.valor_cliente)}
           icon={User}
           color="green"
         />
@@ -210,8 +219,70 @@ const CustomerDetail = () => {
           </div>
         </div>
       </div>
+      {showPurchaseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900">Registrar compra</h3>
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Monto</label>
+                <input
+                  type="number"
+                  value={monto}
+                  onChange={(e) => setMonto(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Fecha de compra (opcional)</label>
+                <input
+                  type="datetime-local"
+                  value={fechaCompra}
+                  onChange={(e) => setFechaCompra(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => setShowPurchaseModal(false)}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={async () => {
+                  if (!monto || Number(monto) <= 0) {
+                    alert("Ingresa un monto mayor a 0");
+                    return;
+                  }
+                  try {
+                    await registerPurchase(Number(id), {
+                      monto: Number(monto),
+                      fecha_compra: fechaCompra
+                        ? fechaCompra.replace("T", " ") + ":00"
+                        : undefined,
+                    });
+                    await fetchCustomerDetails(Number(id));
+                    setShowPurchaseModal(false);
+                    setMonto("");
+                    setFechaCompra("");
+                  } catch (e) {
+                    alert("No se pudo registrar la compra");
+                  }
+                }}
+                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+
 };
 
 export default CustomerDetail;
