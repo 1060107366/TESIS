@@ -57,6 +57,13 @@ const Analysis = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">Análisis</h1>
         <button
+          onClick={() => updatePredictions().then(fetchAnalysisData)}
+          disabled={isLoading}
+          className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+        >
+          Ejecutar predicciones
+        </button>
+        <button
           onClick={() => fetchAnalysisData()}
           disabled={isLoading}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
