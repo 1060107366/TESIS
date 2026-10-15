@@ -23,20 +23,29 @@ export const useDashboardStore = create((set) => ({
   fetchDashboardData: async () => {
     set({ isLoading: true, error: null });
     try {
-      const [recentActivity, churnAvg, bySegment] = await Promise.all([
-        customerApiService.getRecentActivity(),
+      let recentActivity = [];
+      try {
+        recentActivity = await customerApiService.getRecentActivity();
+      } catch {
+        recentActivity = [];
+      }
+      const [churnAvg, bySegment] = await Promise.all([
         predictionApiService.getGlobalChurnAvg(),
         trendsApiService.getClientsBySegment(),
       ]);
 
-      const segmentCount = Array.isArray(bySegment)
-        ? bySegment.length
-        : (bySegment?.segmentos?.length ?? 0);
+      const segmentTotal = Array.isArray(bySegment)
+        ? bySegment.reduce((acc, item) => acc + (Number(item?.value) || 0), 0)
+        : 0;
+      const segmentCount = Array.isArray(bySegment) ? bySegment.length : 0;
+      const churnValue = churnAvg
+        ? (Object.values(churnAvg)[0] ?? "Sin riesgo")
+        : "Sin riesgo";
 
       set({
         metrics: {
-          totalClients: bySegment?.total_clientes ?? 0,
-          churnRate: churnAvg ? JSON.stringify(churnAvg) : "0%",
+          totalClients: segmentTotal,
+          churnRate: String(churnValue),
           segments: segmentCount,
         },
         recentActivity: Array.isArray(recentActivity)

@@ -106,10 +106,10 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trends}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="valor" fill="#3B82F6" />
+                <Bar dataKey="value" fill="#3B82F6" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -124,10 +124,10 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trends}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="valor" fill="#10B981" />
+                <Bar dataKey="value" fill="#10B981" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -163,23 +163,17 @@ const Dashboard = () => {
               {recentActivity.map((activity, index) => (
                 <tr key={index}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {activity.client}
+                    {activity.cliente || activity.client || "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {activity.action}
+                    {activity.accion || activity.action || "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {activity.date}
+                    {activity.fecha || activity.date || "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        activity.status === "Completado"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {activity.status}
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                      Registrado
                     </span>
                   </td>
                 </tr>
