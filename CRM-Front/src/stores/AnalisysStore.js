@@ -43,6 +43,7 @@ export const useAnalysisStore = create((set) => ({
   updatePredictions: async () => {
     set({ isLoading: true });
     try {
+      await predictionApiService.predictChurnAll();
       await predictionApiService.segmentClients();
       set({ isLoading: false, error: null });
     } catch (error) {
