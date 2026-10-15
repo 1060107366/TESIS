@@ -113,12 +113,14 @@ def assign_segments_to_customers(customer_id=None):
             X_scaled = scaler.transform(X)
             predictions = kmeans.predict(X_scaled)
 
-            # Mapear segmentos para clientes regulares
-            segment_map = {
-                0: 1,  # Bajo valor
-                1: 2,  # Medio valor
-                2: 3   # Alto valor
-            }
+            # Determinar mapeo din�mico seg�n centroides (menor -> bajo, mayor -> alto)
+            centers = getattr(kmeans, "cluster_centers_", None)
+            if centers is not None:
+                scores = [float(c[0] + c[1] - c[2]) for c in centers]
+                order = sorted(range(len(scores)), key=lambda i: scores[i])
+                segment_map = {cluster_idx: seg_id for seg_id, cluster_idx in enumerate(order, start=1)}
+            else:
+                segment_map = { 0: 1, 1: 2, 2: 3 }
 
             for pos, (i, row) in enumerate(regular_customers.iterrows()):
                 updates.append({
