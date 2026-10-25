@@ -1,3 +1,6 @@
+# Dependencias de la API (lo que instala el Dockerfile).
+# Para ejecutar los notebooks de IA use: pip install -r requirements-notebooks.txt
+
 # ===== Core web =====
 flask==2.3.3
 werkzeug==2.3.8
@@ -24,13 +27,14 @@ cryptography>=43.0.0         # requerido por PyMySQL para auth sha256_password
 # ===== Auth / JWT =====
 flask-jwt-extended==4.7.1
 pyjwt==2.10.1
+flask-bcrypt==1.0.1          # app/__init__.py usa flask_bcrypt
 bcrypt==4.2.1
 
 # ===== CORS / Config =====
 flask-cors==5.0.0
 python-dotenv==1.0.1
 
-# ===== IA / ML (carga de modelos .pkl) =====
+# ===== IA / ML (la API carga los modelos .pkl) =====
 numpy==2.2.6
 pandas==2.2.3
 scipy==1.15.3
@@ -41,3 +45,5 @@ python-dateutil==2.9.0.post0
 pytz==2025.2
 tzdata==2025.2
 
+# ===== Servidor de producción (Dockerfile) =====
+gunicorn==23.0.0

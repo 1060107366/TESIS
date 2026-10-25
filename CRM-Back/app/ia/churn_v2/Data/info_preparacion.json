@@ -1,0 +1,58 @@
+{
+  "ventana_prediccion_dias": 90,
+  "ventana_observacion_dias": 365,
+  "definicion_etiqueta": "churn = 1 si el cliente, con >=1 compra en los 365 días previos al corte, NO compra en los 90 días siguientes al corte",
+  "cortes": {
+    "train": [
+      "2010-12-01",
+      "2011-01-01",
+      "2011-02-01",
+      "2011-03-01"
+    ],
+    "valid": [
+      "2011-06-01"
+    ],
+    "test": [
+      "2011-09-01"
+    ]
+  },
+  "limpieza_online_retail_ii": {
+    "inicial": 1067371,
+    "sin cliente nulo": 824364,
+    "sin cancelaciones": 805620,
+    "cantidad y precio > 0": 805549,
+    "solo Reino Unido": 725250
+  },
+  "intercompra_percentiles_25_50_75_90": [
+    7.0,
+    25.0,
+    62.0,
+    137.0
+  ],
+  "auditoria_v1": {
+    "n_clientes": 550,
+    "prevalencia_churn": 0.8345,
+    "auc_usando_solo_recencia": 1.0,
+    "coincidencia_etiqueta_con_regla": {
+      ">60_dias_sin_comprar": 0.9436,
+      ">90_dias_sin_comprar": 0.9982,
+      ">120_dias_sin_comprar": 0.9709,
+      ">180_dias_sin_comprar": 0.9364
+    },
+    "corr_eventos_compra_vs_total_purchases": 0.1124,
+    "pct_clientes_con_compras_despues_de_last_purchase_date": 0.8255,
+    "v1_reportado": {
+      "accuracy": 1.0,
+      "matriz_confusion": [
+        [
+          18,
+          0
+        ],
+        [
+          0,
+          92
+        ]
+      ]
+    }
+  }
+}

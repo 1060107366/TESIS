@@ -100,6 +100,17 @@ const CustomerList = () => {
     return `$${Number(number).toFixed(decimals)}`;
   };
 
+  // Formatear total de compras como entero en moneda
+  const formatTotalCompras = (number) => {
+    if (number === null || number === undefined) return "N/A";
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(Math.round(Number(number)));
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -246,7 +257,7 @@ const CustomerList = () => {
                       {formatDate(customer.ultima_compra)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatNumber(customer.total_compras)}
+                      {formatTotalCompras(customer.total_compras)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -272,22 +283,22 @@ const CustomerList = () => {
                       {formatNumber(customer.valor_cliente)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
+                      <div className="flex justify-end space-x-3">
                         <button
                           onClick={() => navigate(`/customers/${customer.id}`)}
-                          className="text-blue-600 hover:text-blue-900 transition-colors"
-                          title="Editar cliente"
+                          className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Ver/Editar cliente"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() =>
                             handleDelete(customer.id, customer.nombre)
                           }
-                          className="text-red-600 hover:text-red-900 transition-colors"
+                          className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
                           title="Eliminar cliente"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
                     </td>

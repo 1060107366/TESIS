@@ -65,4 +65,38 @@ def create_app():
     from app.commands import register_commands
     register_commands(app)
 
+    registrar_manejo_de_errores(app)
     return app
+
+
+def registrar_manejo_de_errores(app):
+    """Respuestas de error uniformes en JSON.
+
+    El frontend (fetchWithAuth) muestra `message`; las rutas responden con `error`
+    y flask-jwt-extended con `msg`. Se copian a `message` para que el usuario vea
+    el motivo real (p. ej. "El email ya está en uso" o "Token has expired").
+    """
+    from flask import jsonify
+    from werkzeug.exceptions import HTTPException
+
+    @app.after_request
+    def agregar_message(respuesta):
+        if respuesta.status_code >= 400 and respuesta.is_json:
+            datos = respuesta.get_json(silent=True)
+            if isinstance(datos, dict) and "message" not in datos:
+                texto = datos.get("error") or datos.get("msg")
+                if texto:
+                    datos["message"] = texto
+                    respuesta.set_data(app.json.dumps(datos))
+        return respuesta
+
+    @app.errorhandler(HTTPException)
+    def error_http(e):
+        return jsonify({"error": e.description, "message": e.description}), e.code
+
+    @app.errorhandler(Exception)
+    def error_inesperado(e):
+        db.session.rollback()
+        app.logger.exception("Error no controlado")
+        return jsonify({"error": "Error interno del servidor", "message": "Error interno del servidor",
+                        "detalle": str(e)}), 500

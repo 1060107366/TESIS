@@ -1,0 +1,281 @@
+{
+  "version": "2.0.0",
+  "fecha_entrenamiento": "2026-10-24T19:03:11+00:00",
+  "fuente": "online_retail_ii",
+  "variables": [
+    "recencia_dias",
+    "frecuencia",
+    "log_monetario_relativo"
+  ],
+  "k": 4,
+  "seleccion_k": [
+    {
+      "k": 2,
+      "inercia_train": 24087.398377171285,
+      "silhouette": 0.4611388045444941,
+      "davies_bouldin": 0.8616413631275981,
+      "calinski_harabasz": 4109.259961369003,
+      "ari_temporal": 0.9310723437241252,
+      "tamano_minimo": 0.345679012345679
+    },
+    {
+      "k": 3,
+      "inercia_train": 18261.713023369484,
+      "silhouette": 0.35485296538450994,
+      "davies_bouldin": 1.0490791010276996,
+      "calinski_harabasz": 3324.443403066368,
+      "ari_temporal": 0.8929363735014452,
+      "tamano_minimo": 0.1652809271856891
+    },
+    {
+      "k": 4,
+      "inercia_train": 14538.660622800026,
+      "silhouette": 0.37802266368665444,
+      "davies_bouldin": 0.8995387539641004,
+      "calinski_harabasz": 3277.992087891367,
+      "ari_temporal": 0.8412635689730317,
+      "tamano_minimo": 0.12043335852859663
+    },
+    {
+      "k": 5,
+      "inercia_train": 12436.48811559784,
+      "silhouette": 0.3218146049616736,
+      "davies_bouldin": 0.995050773414557,
+      "calinski_harabasz": 3029.681077645759,
+      "ari_temporal": 0.770243134485695,
+      "tamano_minimo": 0.09549004787100025
+    },
+    {
+      "k": 6,
+      "inercia_train": 10835.53785134854,
+      "silhouette": 0.32069551068312946,
+      "davies_bouldin": 0.9544039355206996,
+      "calinski_harabasz": 2829.565762886059,
+      "ari_temporal": 0.629186099914242,
+      "tamano_minimo": 0.0710506424792139
+    },
+    {
+      "k": 7,
+      "inercia_train": 9782.95832266398,
+      "silhouette": 0.28448641995751134,
+      "davies_bouldin": 1.001920462786608,
+      "calinski_harabasz": 2712.429266951272,
+      "ari_temporal": 0.7432095733329291,
+      "tamano_minimo": 0.057193247669438146
+    },
+    {
+      "k": 8,
+      "inercia_train": 8964.306073132011,
+      "silhouette": 0.28508131572876116,
+      "davies_bouldin": 1.0056080955041606,
+      "calinski_harabasz": 2572.483114204054,
+      "ari_temporal": 0.4567869612131569,
+      "tamano_minimo": 0.05114638447971781
+    }
+  ],
+  "mapeo": {
+    "2": 1,
+    "1": 2,
+    "0": 2,
+    "3": 3
+  },
+  "perfiles": [
+    {
+      "cluster": 2,
+      "segmento_id": 1,
+      "segmento": "Bajo valor",
+      "perfil": "Bajo valor",
+      "recencia_dias": 148.1,
+      "frecuencia_anual": 1.24,
+      "gasto_vs_tipico": 0.36,
+      "descripcion": "Última compra hace ~148 días, 1.2 compras al año, gasta 0.4 veces lo del cliente típico de la tienda"
+    },
+    {
+      "cluster": 0,
+      "segmento_id": 2,
+      "segmento": "Medio valor",
+      "perfil": "Medio valor · reciente",
+      "recencia_dias": 13.5,
+      "frecuencia_anual": 2.32,
+      "gasto_vs_tipico": 0.86,
+      "descripcion": "Última compra hace ~14 días, 2.3 compras al año, gasta 0.9 veces lo del cliente típico de la tienda"
+    },
+    {
+      "cluster": 1,
+      "segmento_id": 2,
+      "segmento": "Medio valor",
+      "perfil": "Medio valor · en pausa",
+      "recencia_dias": 83.9,
+      "frecuencia_anual": 3.69,
+      "gasto_vs_tipico": 1.86,
+      "descripcion": "Última compra hace ~84 días, 3.7 compras al año, gasta 1.9 veces lo del cliente típico de la tienda"
+    },
+    {
+      "cluster": 3,
+      "segmento_id": 3,
+      "segmento": "Alto valor",
+      "perfil": "Alto valor",
+      "recencia_dias": 16.3,
+      "frecuencia_anual": 11.49,
+      "gasto_vs_tipico": 6.62,
+      "descripcion": "Última compra hace ~16 días, 11.5 compras al año, gasta 6.6 veces lo del cliente típico de la tienda"
+    }
+  ],
+  "comparacion_test": {
+    "K-means v2": {
+      "eta2_gasto_futuro": 0.25622023701046537,
+      "silhouette": 0.35103205824173844,
+      "tamano_min": 0.1431466936914112,
+      "tamano_max": 0.4466683557131999,
+      "monotono": true,
+      "lift_alto_valor": 4.137998955754051
+    },
+    "Quintiles RFM": {
+      "eta2_gasto_futuro": 0.24543019714282888,
+      "silhouette": 0.292801292504625,
+      "tamano_min": 0.29085381302254876,
+      "tamano_max": 0.39650367367620976,
+      "monotono": true,
+      "lift_alto_valor": 2.5330269294646746
+    },
+    "Regla anterior": {
+      "eta2_gasto_futuro": 0.21794740287166178,
+      "silhouette": 0.28994116367148093,
+      "tamano_min": 0.10387636179376741,
+      "tamano_max": 0.7544970863947301,
+      "monotono": true,
+      "lift_alto_valor": 5.305173828558874
+    }
+  },
+  "tablas_test": {
+    "K-means v2": [
+      {
+        "seg": "Bajo valor",
+        "pct_clientes": 0.4466683557131999,
+        "volvio_a_comprar": 0.27680090754395914,
+        "gasto_futuro_medio": 131.31909926262054,
+        "pct_ingreso_futuro": 0.10399295290170688
+      },
+      {
+        "seg": "Medio valor",
+        "pct_clientes": 0.4101849505953889,
+        "volvio_a_comprar": 0.5812229771463867,
+        "gasto_futuro_medio": 417.5667140210006,
+        "pct_ingreso_futuro": 0.3036661780835887
+      },
+      {
+        "seg": "Alto valor",
+        "pct_clientes": 0.1431466936914112,
+        "volvio_a_comprar": 0.9079646017699115,
+        "gasto_futuro_medio": 2333.9929911504423,
+        "pct_ingreso_futuro": 0.5923408690147045
+      }
+    ],
+    "Quintiles RFM": [
+      {
+        "seg": "Bajo valor",
+        "pct_clientes": 0.39650367367620976,
+        "volvio_a_comprar": 0.263258785942492,
+        "gasto_futuro_medio": 162.59863322683705,
+        "pct_ingreso_futuro": 0.11430229103992275
+      },
+      {
+        "seg": "Medio valor",
+        "pct_clientes": 0.31264251330124143,
+        "volvio_a_comprar": 0.49108589951377635,
+        "gasto_futuro_medio": 268.73395542949754,
+        "pct_ingreso_futuro": 0.14895716803647796
+      },
+      {
+        "seg": "Alto valor",
+        "pct_clientes": 0.29085381302254876,
+        "volvio_a_comprar": 0.8048780487804879,
+        "gasto_futuro_medio": 1428.7260975609756,
+        "pct_ingreso_futuro": 0.7367405409235993
+      }
+    ],
+    "Regla anterior": [
+      {
+        "seg": "Bajo valor",
+        "pct_clientes": 0.7544970863947301,
+        "volvio_a_comprar": 0.38415043653458697,
+        "gasto_futuro_medio": 226.13954398925455,
+        "pct_ingreso_futuro": 0.3024996721387869
+      },
+      {
+        "seg": "Medio valor",
+        "pct_clientes": 0.1416265518115024,
+        "volvio_a_comprar": 0.7656529516994633,
+        "gasto_futuro_medio": 583.1220572450804,
+        "pct_ingreso_futuro": 0.14641817186700534
+      },
+      {
+        "seg": "Alto valor",
+        "pct_clientes": 0.10387636179376741,
+        "volvio_a_comprar": 0.9024390243902439,
+        "gasto_futuro_medio": 2992.3251951219513,
+        "pct_ingreso_futuro": 0.5510821559942078
+      }
+    ]
+  },
+  "validacion_externa_cdnow": {
+    "metricas": {
+      "eta2_gasto_futuro": 0.18774304682858675,
+      "silhouette": 0.3444278339593847,
+      "tamano_min": 0.10938484148645812,
+      "tamano_max": 0.45328574427881585,
+      "monotono": true,
+      "lift_alto_valor": 4.3987278531817955
+    },
+    "tabla": [
+      {
+        "seg": "Bajo valor",
+        "pct_clientes": 0.45328574427881585,
+        "volvio_a_comprar": 0.15215377489578508,
+        "gasto_futuro_medio": 6.058274664196388,
+        "pct_ingreso_futuro": 0.13517676886161153
+      },
+      {
+        "seg": "Medio valor",
+        "pct_clientes": 0.437329414234726,
+        "volvio_a_comprar": 0.34349495919347095,
+        "gasto_futuro_medio": 17.82243638982237,
+        "pct_ingreso_futuro": 0.3836690821760295
+      },
+      {
+        "seg": "Alto valor",
+        "pct_clientes": 0.10938484148645812,
+        "volvio_a_comprar": 0.7245681381957774,
+        "gasto_futuro_medio": 89.36059500959693,
+        "pct_ingreso_futuro": 0.4811541489623589
+      }
+    ]
+  },
+  "criterios_aceptacion": {
+    "Silhouette (validación) >= 0.25": true,
+    "Estabilidad temporal ARI >= 0.75": true,
+    "Cada segmento entre 5% y 70% de los clientes (test)": true,
+    "Vuelve a comprar y gasto futuro crecen Bajo -> Medio -> Alto (test)": true,
+    "Explica el gasto futuro mejor que la regla anterior (eta2)": true,
+    "Se transfiere a otro negocio (CDNOW monótono)": true
+  },
+  "aceptado": true,
+  "auditoria_segmentacion_anterior": {
+    "modelo_kmeans_usado_por_la_app": false,
+    "segmentacion_en_produccion": "reglas: churn>=0.65 o >90 días sin comprar -> bajo valor; resto por percentiles de CLV 33/45/22",
+    "clientes_entrenamiento_kmeans": 86,
+    "variables": [
+      "total_compras",
+      "frecuencia_compra",
+      "dias_ultima_compra"
+    ],
+    "error_etiquetas": "el clúster 0 de K-means se fusionó con la etiqueta 0 de 'bajo valor' (distribución 530/57/11)"
+  },
+  "entorno": {
+    "python": "3.13.14",
+    "scikit_learn": "1.6.1",
+    "pandas": "2.2.3",
+    "numpy": "2.2.6",
+    "semilla": 42
+  }
+}

@@ -5,6 +5,14 @@ export const trendsApiService = {
     return await fetchWithAuth("/trends/global/actividad_mensual", { method: "GET" });
   },
 
+  async getGlobalMonthlyRevenue() {
+    return await fetchWithAuth("/trends/global/ingresos_mensuales", { method: "GET" });
+  },
+
+  async getGlobalLastMonthRevenue() {
+    return await fetchWithAuth("/trends/global/ingresos_ultimo_mes", { method: "GET" });
+  },
+
   async getGlobalPurchaseFrequency() {
     return await fetchWithAuth("/trends/global/frecuencia_compra", { method: "GET" });
   },

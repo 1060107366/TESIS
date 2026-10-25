@@ -1,0 +1,54 @@
+{
+  "ventana_observacion_dias": 365,
+  "ventana_futura_dias": 90,
+  "variables_rfm": [
+    "recencia_dias",
+    "frecuencia",
+    "log_monetario_relativo"
+  ],
+  "cortes": {
+    "train": [
+      "2010-12-01",
+      "2011-01-01",
+      "2011-02-01",
+      "2011-03-01"
+    ],
+    "valid": [
+      "2011-06-01"
+    ],
+    "test": [
+      "2011-09-01"
+    ]
+  },
+  "auditoria_segmentacion_anterior": {
+    "modelo_kmeans_usado_por_la_app": false,
+    "segmentacion_en_produccion": "reglas: churn>=0.65 o >90 días sin comprar -> bajo valor; resto por percentiles de CLV 33/45/22",
+    "clientes_entrenamiento_kmeans": 86,
+    "variables": [
+      "total_compras",
+      "frecuencia_compra",
+      "dias_ultima_compra"
+    ],
+    "error_etiquetas": "el clúster 0 de K-means se fusionó con la etiqueta 0 de 'bajo valor' (distribución 530/57/11)",
+    "centroides_v1": [
+      {
+        "total_compras": 7.83,
+        "frecuencia_compra": 4.98,
+        "dias_ultima_compra": 67.0,
+        "clientes": 18
+      },
+      {
+        "total_compras": 6.42,
+        "frecuencia_compra": 1.34,
+        "dias_ultima_compra": 40.58,
+        "clientes": 57
+      },
+      {
+        "total_compras": 36.45,
+        "frecuencia_compra": 1.07,
+        "dias_ultima_compra": 68.55,
+        "clientes": 11
+      }
+    ]
+  }
+}

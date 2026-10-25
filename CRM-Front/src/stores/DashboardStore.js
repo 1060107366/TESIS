@@ -11,6 +11,8 @@ export const useDashboardStore = create((set) => ({
   },
   recentActivity: [],
   trends: [],
+  monthlyRevenue: [],
+  lastMonthRevenue: { total_ingresos: 0, mes: "", mes_corto: "" },
   segmentData: [],
   isLoading: false,
   error: null,
@@ -20,6 +22,8 @@ export const useDashboardStore = create((set) => ({
   updateMetrics: (metrics) => set({ metrics, isLoading: false }),
   updateActivity: (recentActivity) => set({ recentActivity }),
   updateTrends: (trends) => set({ trends }),
+  updateMonthlyRevenue: (monthlyRevenue) => set({ monthlyRevenue }),
+  updateLastMonthRevenue: (lastMonthRevenue) => set({ lastMonthRevenue }),
   updateSegments: (segmentData) => set({ segmentData }),
 
   fetchDashboardData: async () => {
@@ -28,6 +32,8 @@ export const useDashboardStore = create((set) => ({
       let recentActivity = [];
       let bySegment = [];
       let monthlyActivity = [];
+      let monthlyRevenue = [];
+      let lastMonthRevenue = { total_ingresos: 0, mes: "", mes_corto: "" };
       let churnAvg = null;
       let ownCustomers = [];
       try { recentActivity = await customerApiService.getRecentActivity(); } catch { recentActivity = []; }
@@ -41,6 +47,8 @@ export const useDashboardStore = create((set) => ({
         }
       }
       try { monthlyActivity = await trendsApiService.getGlobalMonthlyActivity(); } catch { monthlyActivity = []; }
+      try { monthlyRevenue = await trendsApiService.getGlobalMonthlyRevenue(); } catch { monthlyRevenue = []; }
+      try { lastMonthRevenue = await trendsApiService.getGlobalLastMonthRevenue(); } catch { lastMonthRevenue = { total_ingresos: 0, mes: "", mes_corto: "" }; }
       try { churnAvg = await predictionApiService.getGlobalChurnAvg(); } catch { churnAvg = null; }
       try {
         const customers = await customerApiService.getCustomers();
@@ -65,6 +73,8 @@ export const useDashboardStore = create((set) => ({
           ? recentActivity
           : (recentActivity?.actividad ?? []),
         trends: Array.isArray(monthlyActivity) ? monthlyActivity : [],
+        monthlyRevenue: Array.isArray(monthlyRevenue) ? monthlyRevenue : [],
+        lastMonthRevenue: lastMonthRevenue || { total_ingresos: 0, mes: "", mes_corto: "" },
         segmentData: Array.isArray(bySegment) ? bySegment : [],
         isLoading: false,
       });

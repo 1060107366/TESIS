@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Users, TrendingDown, Layers } from "lucide-react";
+import { Users, TrendingDown, Layers, DollarSign, ShoppingCart } from "lucide-react";
 import { useDashboardStore } from "../../stores/DashboardStore";
 
 const Dashboard = () => {
@@ -17,6 +17,8 @@ const Dashboard = () => {
     metrics,
     recentActivity,
     trends,
+    monthlyRevenue,
+    lastMonthRevenue,
     segmentData,
     isLoading,
     error,
@@ -41,6 +43,31 @@ const Dashboard = () => {
       </div>
     </div>
   );
+
+  const RevenueCard = ({ title, value, subtitle, icon: Icon, color }) => (
+    <div className="bg-white rounded-lg shadow p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className="mt-2 text-2xl font-semibold text-gray-900">{value}</p>
+          <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+        </div>
+        <div className={`p-3 rounded-full ${color}`}>
+          <Icon className="w-6 h-6 text-white" />
+        </div>
+      </div>
+    </div>
+  );
+
+  const formatCurrency = (value) => {
+    if (value === null || value === undefined) return "$0";
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
+  };
 
   console.log("Current metrics:", metrics); // Para debugging
   console.log("Loading state:", isLoading); // Para debugging
@@ -98,11 +125,38 @@ const Dashboard = () => {
         />
       </div>
 
+      {/* Grid de Ingresos - Cards/Slides */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <RevenueCard
+          title="Ingresos Último Mes"
+          value={formatCurrency(lastMonthRevenue?.total_ingresos)}
+          subtitle={lastMonthRevenue?.mes_corto || "Sin datos"}
+          icon={DollarSign}
+          color="bg-green-500"
+        />
+        <RevenueCard
+          title="Total Compras (Último Mes)"
+          value={trends?.length ? trends.reduce((acc, t) => acc + (Number(t?.value) || 0), 0) : 0}
+          subtitle="Número de transacciones"
+          icon={ShoppingCart}
+          color="bg-blue-500"
+        />
+        <RevenueCard
+          title="Promedio por Compra"
+          value={trends?.length && trends.reduce((acc, t) => acc + (Number(t?.value) || 0), 0) > 0
+            ? formatCurrency(lastMonthRevenue?.total_ingresos / trends.reduce((acc, t) => acc + (Number(t?.value) || 0), 0))
+            : "$0"}
+          subtitle="Valor medio de orden"
+          icon={DollarSign}
+          color="bg-amber-500"
+        />
+      </div>
+
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Gráfico de Tendencias */}
+        {/* Gráfico de Tendencias de Actividad */}
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Tendencias</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4">Actividad Mensual (Transacciones)</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trends}>
@@ -116,18 +170,16 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Tendencias por Segmento */}
+        {/* Gráfico de Ingresos Mensuales */}
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">
-            Tendencias por Segmento
-          </h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4">Ingresos Mensuales (COP)</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={segmentData}>
+              <BarChart data={monthlyRevenue}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
+                <XAxis dataKey="month" />
+                <YAxis tickFormatter={(value) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value)} />
+                <Tooltip formatter={(value) => [new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value), "Ingresos"]} />
                 <Bar dataKey="value" fill="#10B981" />
               </BarChart>
             </ResponsiveContainer>

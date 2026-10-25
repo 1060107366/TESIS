@@ -20,7 +20,7 @@ def create_customer(data, user_id):
         total_compras=total_compras,
         frecuencia_compra=0.0,  # Se recalcula después
         valor_medio_orden=valor_medio_orden,
-        probabilidad_churn=0.1,  # Se recalcula después
+        probabilidad_churn=None,  # La calcula el modelo de abandono cuando hay compras
         valor_cliente=10000.0,       # Se recalcula después
         fecha_creacion=fecha_creacion,
         fecha_actualizacion=fecha_creacion
