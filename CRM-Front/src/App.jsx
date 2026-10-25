@@ -1,77 +1,37 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import Layout from "./components/common/Layout.jsx";
-import Login from "./components/auth/Login.jsx";
-import Register from "./components/auth/Register.jsx";
-import Dashboard from "./components/dashboard/Dashboard.jsx";
-import CustomerList from "./components/customers/CustomerList.jsx";
-import CustomerDetail from "./components/customers/CustomerDetail.jsx";
-import CreateCustomer from "./components/customers/CreateCustomer.jsx";
-import Analysis from "./components/analisys/Analisys.jsx";
-import Recommendations from "./components/recommendations/Recommendations.jsx";
-import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
-import { isAuthenticated } from "./services/auth/authService.js";
+import { lazy } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { RutaProtegida } from "./components/layout/Marco.jsx";
+import { CrearCuenta, Ingresar } from "./pages/Acceso.jsx";
 
-function App() {
+// Cada pantalla se descarga solo cuando se abre (carga más rápida en el celular)
+const Inicio = lazy(() => import("./pages/Inicio.jsx"));
+const Clientes = lazy(() => import("./pages/Clientes.jsx"));
+const ClienteDetalle = lazy(() => import("./pages/ClienteDetalle.jsx"));
+const RegistrarVenta = lazy(() => import("./pages/RegistrarVenta.jsx"));
+const MiTienda = lazy(() => import("./pages/MiTienda.jsx"));
+const Ofertas = lazy(() => import("./pages/Ofertas.jsx"));
+const MiCuenta = lazy(() => import("./pages/MiCuenta.jsx"));
+
+export default function App() {
   return (
-    <Router>
-      <Routes>        
-        {/* Rutas públicas */}
-        <Route
-          path="/login"
-          element={
-            isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Login />
-          }
-        />
-
-        <Route
-          path="/register"
-          element={
-            isAuthenticated() ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Register />
-            )
-          }
-        />
-
-        {/* Rutas protegidas */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-
-          {/* Clientes */}
-          <Route path="customers">
-            <Route index element={<CustomerList />} />
-            <Route path="new" element={<CreateCustomer />} />
-            <Route path=":id" element={<CustomerDetail />} />
-            <Route path="/customers/:id/edit" element={<CreateCustomer />} />
-          </Route>
-
-          {/* Análisis */}
-          <Route path="analysis" element={<Analysis />} />
-
-          {/* Recomendaciones */}
-          <Route path="recommendations" element={<Recommendations />} />
-
-          {/* Ruta para manejar rutas no encontradas */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-
+    <BrowserRouter>
+      <Routes>
+        <Route path="/ingresar" element={<Ingresar />} />
+        <Route path="/crear-cuenta" element={<CrearCuenta />} />
+        <Route element={<RutaProtegida />}>
+          <Route path="/inicio" element={<Inicio />} />
+          <Route path="/clientes" element={<Clientes />} />
+          <Route path="/clientes/:id" element={<ClienteDetalle />} />
+          <Route path="/vender" element={<RegistrarVenta />} />
+          <Route path="/mi-tienda" element={<MiTienda />} />
+          <Route path="/ofertas" element={<Ofertas />} />
+          <Route path="/mi-cuenta" element={<MiCuenta />} />
         </Route>
+        {/* Direcciones de la versión anterior y cualquier otra: al inicio */}
+        <Route path="/login" element={<Navigate to="/ingresar" replace />} />
+        <Route path="/register" element={<Navigate to="/crear-cuenta" replace />} />
+        <Route path="*" element={<Navigate to="/inicio" replace />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
-
-export default App;

@@ -1,6 +1,0 @@
-const config = {
-  API_URL: import.meta.env.VITE_API_URL || "http://localhost:5001",
-  API_TIMEOUT: 5000,
-};
-
-export default config;

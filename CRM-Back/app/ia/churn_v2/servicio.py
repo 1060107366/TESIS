@@ -162,8 +162,8 @@ def explicar(fila: pd.Series) -> list[str]:
     if fila["compra_unica"] >= 1:
         r.append("Solo ha comprado una vez en el último año")
     elif fila["ratio_recencia"] >= 1.5:
-        r.append(f"Lleva {fila['ratio_recencia']:.1f} veces su intervalo habitual sin comprar "
-                 f"({fila['recencia_dias']:.0f} días; suele comprar cada {fila['intercompra_media']:.0f})")
+        r.append(f"Suele comprar cada {fila['intercompra_media']:.0f} días y ya lleva "
+                 f"{fila['recencia_dias']:.0f} sin venir")
     if fila["compras_90d"] == 0:
         r.append("No ha comprado en los últimos 90 días")
     if fila["tendencia_90d"] < 0:
