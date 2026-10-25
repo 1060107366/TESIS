@@ -12,6 +12,7 @@ import CustomerList from "./components/customers/CustomerList.jsx";
 import CustomerDetail from "./components/customers/CustomerDetail.jsx";
 import CreateCustomer from "./components/customers/CreateCustomer.jsx";
 import Analysis from "./components/analisys/Analisys.jsx";
+import Recommendations from "./components/recommendations/Recommendations.jsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 import { isAuthenticated } from "./services/auth/authService.js";
 
@@ -60,6 +61,9 @@ function App() {
 
           {/* Análisis */}
           <Route path="analysis" element={<Analysis />} />
+
+          {/* Recomendaciones */}
+          <Route path="recommendations" element={<Recommendations />} />
 
           {/* Ruta para manejar rutas no encontradas */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

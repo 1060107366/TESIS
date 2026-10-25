@@ -6,6 +6,7 @@ import {
   LogOut,
   UserCog,
   User,
+  Gift,
 } from "lucide-react";
 import { useLogout } from "../../services/auth/logoutHandler.js";
 import { useState, useEffect } from "react";
@@ -26,6 +27,7 @@ const Layout = () => {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Clientes", href: "/customers", icon: Users },
     { name: "Análisis", href: "/analysis", icon: BarChart2 },
+    { name: "Recomendaciones", href: "/recommendations", icon: Gift },
   ];
 
   const isActive = (path) => location.pathname.startsWith(path);

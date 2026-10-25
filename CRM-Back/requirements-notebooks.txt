@@ -1,0 +1,7 @@
+# Dependencias para ejecutar los notebooks de IA (DataPrepare / TrainModel)
+# de app/ia/churn_v2 y app/ia/segmentacion. Incluye todo lo de la API.
+-r requirements.txt
+
+matplotlib==3.10.8      # gráficos de los notebooks (3.8.x no tiene versión para Python 3.13)
+ipykernel==6.29.5       # kernel de Jupyter para VS Code
+openpyxl==3.1.5         # solo si se convierte online_retail_II.xlsx descargado de la UCI

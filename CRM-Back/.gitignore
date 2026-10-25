@@ -7,6 +7,9 @@ __pycache__/
 migrations/
 *.ipynb
 app/ia/**/*.ipynb
+# Notebooks del modelo de abandono v2 (preparación y entrenamiento): SÍ se versionan
+!app/ia/churn_v2/*.ipynb
+!app/ia/segmentacion/*.ipynb
 
 # Virtual environment
 .venv/
@@ -153,3 +156,13 @@ cython_debug/
 *.weights
 *.cfg
 *.csv
+
+# Exportación local de la base de datos (contiene datos)
+exportacion_bd/
+
+# Datasets pequeños del modelo v1 que usa la auditoría de churn_v2/DataPrepare.ipynb
+!app/ia/datasets/Customers_Data.csv
+!app/ia/datasets/Customer_Activity_Data.csv
+
+# Instrucciones de restauración generadas por limpieza_bd.py (locales)
+respaldo_*_RESTAURAR.sql

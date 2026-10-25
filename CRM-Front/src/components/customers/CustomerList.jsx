@@ -23,6 +23,7 @@ const CustomerList = () => {
   } = useCustomerStore();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSegment, setSelectedSegment] = useState(null);
   const [filteredCustomers, setFilteredCustomers] = useState([]);
 
   // Cargar clientes al montar el componente
@@ -42,11 +43,13 @@ const CustomerList = () => {
   useEffect(() => {
     const filtered = customers.filter(
       (customer) =>
-        customer.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        (selectedSegment === null ||
+          (customer.segmento_id ?? 0) === selectedSegment) &&
+        (customer.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          customer.email?.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredCustomers(filtered);
-  }, [customers, searchTerm]);
+  }, [customers, searchTerm, selectedSegment]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -97,6 +100,17 @@ const CustomerList = () => {
     return `$${Number(number).toFixed(decimals)}`;
   };
 
+  // Formatear total de compras como entero en moneda
+  const formatTotalCompras = (number) => {
+    if (number === null || number === undefined) return "N/A";
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(Math.round(Number(number)));
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -134,6 +148,47 @@ const CustomerList = () => {
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Cliente
         </button>
+      </div>
+
+      {/* Segmentos */}
+      <div className="flex gap-2 flex-wrap">
+        {Object.entries(
+          customers.reduce((acc, c) => {
+            const id = c.segmento_id ?? 0;
+            acc[id] = (acc[id] || 0) + 1;
+            return acc;
+          }, {})
+        ).map(([id, count]) => {
+          const labels = {
+            0: "Sin segmento",
+            1: "Bajo valor",
+            2: "Medio valor",
+            3: "Alto valor",
+            4: "Nuevos",
+          };
+          const active = selectedSegment === Number(id);
+          return (
+            <button
+              key={id}
+              onClick={() => setSelectedSegment(active ? null : Number(id))}
+              className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                active
+                  ? id === "0" ? "bg-slate-600 text-white border-slate-600"
+                    : id === "1" ? "bg-red-600 text-white border-red-600"
+                    : id === "2" ? "bg-amber-600 text-white border-amber-600"
+                    : id === "3" ? "bg-green-600 text-white border-green-600"
+                    : "bg-indigo-600 text-white border-indigo-600"
+                  : id === "0" ? "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
+                    : id === "1" ? "bg-red-50 text-red-700 border-red-300 hover:bg-red-100"
+                    : id === "2" ? "bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100"
+                    : id === "3" ? "bg-green-50 text-green-700 border-green-300 hover:bg-green-100"
+                    : "bg-indigo-50 text-indigo-700 border-indigo-300 hover:bg-indigo-100"
+              }`}
+            >
+              {labels[id] || `Segmento ${id}`}: {count}
+            </button>
+          );
+        })}
       </div>
 
       {/* Barra de búsqueda y filtros */}
@@ -202,7 +257,7 @@ const CustomerList = () => {
                       {formatDate(customer.ultima_compra)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatNumber(customer.total_compras)}
+                      {formatTotalCompras(customer.total_compras)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -228,22 +283,22 @@ const CustomerList = () => {
                       {formatNumber(customer.valor_cliente)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
+                      <div className="flex justify-end space-x-3">
                         <button
                           onClick={() => navigate(`/customers/${customer.id}`)}
-                          className="text-blue-600 hover:text-blue-900 transition-colors"
-                          title="Editar cliente"
+                          className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Ver/Editar cliente"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() =>
                             handleDelete(customer.id, customer.nombre)
                           }
-                          className="text-red-600 hover:text-red-900 transition-colors"
+                          className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
                           title="Eliminar cliente"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
                     </td>

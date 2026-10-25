@@ -93,7 +93,7 @@ export const useCustomerStore = create((set) => ({
       const [customer, interactions, metrics] = await Promise.all([
         customerApiService.getCustomerDetails(id),
         customerApiService.getCustomerInteractions(id),
-        customerApiService.getCustomerMetrics(id),
+        customerApiService.getCustomerMetrics(id).catch(() => []),
       ]);
 
       const customerDetails = {

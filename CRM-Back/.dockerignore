@@ -1,0 +1,17 @@
+# Entorno local y secretos (las variables se pasan al contenedor al ejecutarlo)
+.venv/
+.env
+*.env
+**/__pycache__/
+*.pyc
+
+# Solo se usan para entrenar en los notebooks; la API solo necesita modelos/
+app/ia/datasets/
+app/ia/*/Data/
+*.ipynb
+
+# Otros
+.git/
+.gitignore
+Dockerfile
+.dockerignore

@@ -12,7 +12,7 @@ auth_bp = Blueprint('auth', __name__)
 # Registro de usuario
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     # Validar datos enviados
     if not data.get('usuario') or not data.get('email') or not data.get('contrasena'):
@@ -21,7 +21,8 @@ def register():
     if len(data['contrasena']) < 6: #tamaño de ta contraseña
         return jsonify({"message": "La contraseña debe tener al menos 6 caracteres"}), 400
 
-    # Verificar si el email o usuario ya existe
+    # Verificar si el email o usuario ya existe (el email se guarda en minúsculas)
+    data['email'] = data['email'].strip().lower()
     if User.query.filter((User.usuario == data['usuario']) | (User.email == data['email'])).first():
         return jsonify({"message": "El email o usuario ya está en uso"}), 400
 
@@ -61,14 +62,14 @@ def register():
 # Iniciar sesión
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     # Validar datos enviados
     if not data.get('email') or not data.get('contrasena'):
         return jsonify({"message": "Se requieren 'email' y 'contrasena'"}), 400
 
     # Buscar usuario por email
-    user = User.query.filter_by(email=data['email'].lower()).first()
+    user = User.query.filter_by(email=str(data["email"]).strip().lower()).first()
 
     # Verificar credenciales
     if not user or not user.check_password(data['contrasena']):
@@ -86,8 +87,8 @@ def update_user():
     user_id = get_jwt_identity()
 
     # Obtener datos enviados
-    data = request.get_json()
-    user = User.query.get(user_id)
+    data = request.get_json(silent=True) or {}
+    user = db.session.get(User, int(user_id))
 
     # Verificar si el usuario existe
     if not user:
@@ -95,6 +96,7 @@ def update_user():
 
     # Validar campos opcionales
     if 'email' in data:
+        data['email'] = data['email'].strip().lower()   # el login busca el email en minúsculas
         if User.query.filter(User.email == data['email'], User.id != user_id).first():
             return jsonify({"error": "El email ya está registrado"}), 400
         user.email = data['email']
@@ -119,7 +121,7 @@ def get_user_info():
     from flask_jwt_extended import get_jwt_identity
     user_id = get_jwt_identity()
 
-    user = User.query.get(user_id)
+    user = db.session.get(User, int(user_id))
     
     if not user:
         return jsonify({"error": "Usuario no encontrado"}), 404

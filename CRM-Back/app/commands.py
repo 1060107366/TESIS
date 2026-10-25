@@ -26,10 +26,35 @@ def register_commands(app: Flask):
         Actualiza los segmentos de clientes usando el modelo K-means.
         """
         from app.services.ia_service import assign_segments_to_customers
-        try:
-            assign_segments_to_customers()
-            print("Segmentos actualizados exitosamente.")
-        except Exception as e:
-            print(f"Error al actualizar segmentos: {e}")
+        ok, mensaje = assign_segments_to_customers()
+        print(mensaje if ok else f"Error al actualizar segmentos: {mensaje}")
+
+    # ------------------------------------------------------------ modelo de abandono v2
+    import json
+    import click
+
+    @app.cli.command('churn-predict')
+    @click.option('--usuario', type=int, default=None, help='Solo los clientes de este usuario/tienda')
+    def churn_predict(usuario):
+        """Recalcula la probabilidad de abandono (modelo v2) y guarda el historial."""
+        from app.ia.churn_v2 import servicio
+        print(json.dumps(servicio.actualizar_probabilidades(usuario_id=usuario), indent=2, ensure_ascii=False))
+
+    @app.cli.command('churn-monitor')
+    @click.option('--usuario', type=int, default=None)
+    def churn_monitor(usuario):
+        """Reporte de deriva (PSI) frente a los datos de entrenamiento."""
+        from app.ia.churn_v2 import servicio
+        print(json.dumps(servicio.monitorear(usuario_id=usuario), indent=2, ensure_ascii=False))
+
+    @app.cli.command('churn-recalibrate')
+    @click.option('--corte', required=True, help='Fecha de corte AAAA-MM-DD (su ventana futura ya debe haber terminado)')
+    @click.option('--usuario', type=int, default=None)
+    def churn_recalibrate(corte, usuario):
+        """Recalibra el modelo activo con las compras locales registradas en el CRM."""
+        from app.ia.churn_v2 import servicio
+        print(json.dumps(servicio.recalibrar_con_bd(corte, usuario_id=usuario), indent=2, ensure_ascii=False))
+
+    # El entrenamiento se hace en los notebooks app/ia/churn_v2/DataPrepare.ipynb y TrainModel.ipynb
 
 

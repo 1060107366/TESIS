@@ -2,7 +2,7 @@
 ## **Requisitos Previos**
 ## prove git
 Asegúrate de tener instalados los siguientes programas antes de comenzar con la configuración del proyecto:
-- Python 3.8 o superior
+- Python 3.13
 - MySQL
 - Visual Studio Code
 
@@ -27,7 +27,8 @@ Asegúrate de tener instalados los siguientes programas antes de comenzar con la
 ```
 3. **instala dependencias**
 ```powershell
-    pip install -r requirements.txt
+    pip install -r requirements-notebooks.txt   # API + notebooks de IA (desarrollo)
+    # o solo la API:  pip install -r requirements.txt
 ```
 4. **Correr App/Backend**
 Ejecuta el proyecto desde el archivo *run.py*
@@ -35,42 +36,39 @@ o ejecuta el comando:
 >flask run
 
 5. **Pruebas**
-El archivo rutas.md contiene todas las peticiones disponibles
->rutas.md
+El notebook `crud_cliente.ipynb` y `docs/api-contract.md` describen las peticiones disponibles
 
-# **Configuracion Modulos IA**
-## **Churn**
-### *Creacion de datos .csv*
->! La base de datos debe estar actualizada al modelo mas reciente
-1. Ejecutar el notebook *DataPrepare.ipynb* para generar el archivo .csv que contiene los datos para el entrenamiento del modulo
+# **Base de datos: mantenimiento y datos de demostración**
+Scripts en `CRM-Back` (con el entorno virtual activado y MySQL encendido):
 
->se optiene *Datos históricos exportados a app/ia/churn_model/data_export_churn_service.csv*
+| Script | Qué hace |
+|---|---|
+| `python exportar_bd.py` | Exporta la estructura y los datos (con datos personales enmascarados) a `exportacion_bd/` para analizarlos |
+| `python limpieza_bd.py` | **Simulación:** muestra qué limpiaría, sin cambiar nada |
+| `python limpieza_bd.py --ejecutar` | Respaldo completo en `<bd>_respaldo_<fecha>` + limpieza + restricciones + recálculo de riesgo y segmentos. Deja un archivo `respaldo_<fecha>_RESTAURAR.sql` para volver atrás |
+| `python cargar_demo.py` | Crea la tienda demo (`demo@tienda-demo.co` / `Demo2026*`) con 300 clientes y su historial real de compras (Online Retail II, en pesos, con nombres ficticios) |
+| `python cargar_demo.py --reemplazar` | Borra la tienda demo y la vuelve a crear |
+| `python seed.py` | Crea o actualiza los datos base: tipos de interacción, segmentos (nombres oficiales) y catálogo de recomendaciones |
+| `python probar_api.py` | Con el backend corriendo, prueba todas las rutas (auth, customer, predictions, trends, recomendaciones) |
 
-2. Cargar los datos *data_export_churn_service.csv* al modelo de entrenamiento y prediccion
->Ejecutar el archivo notebook *TrainModel.ipynb*
+# **Módulos de IA**
+Los dos modelos se preparan y entrenan con notebooks de Jupyter (por bloques) y la API los usa automáticamente.
 
->La matriz de confucion, reporte de clasificacion y la precicion del modelo que debe de ser 1.0 = 100%
+| Módulo | Carpeta | Pasos |
+|---|---|---|
+| Predicción de abandono (churn) | `app/ia/churn_v2/` | Ejecutar `DataPrepare.ipynb` y luego `TrainModel.ipynb` |
+| Segmentación de clientes (K-means RFM) | `app/ia/segmentacion/` | Ejecutar `DataPrepare.ipynb` y luego `TrainModel.ipynb` (después del de abandono) |
 
-## **Actualizar metricas**
-Ejecutar los siguientes comandos para actualizar las metricas de frecuencia y de mas:
-```python
-    flask update-all-metrics
+- **Datasets:** en `app/ia/datasets/` (Online Retail II y CDNOW).
+- **Documentación:** en el `README.md` de cada carpeta. La ficha de cada modelo está en `modelos/v2.0.0/model_card.md`.
+
+**Comandos útiles:**
+```powershell
+flask update-all-metrics     # recalcula métricas de clientes
+flask churn-predict          # recalcula el riesgo de abandono de todos los clientes
+flask update-segments        # recalcula los segmentos de todos los clientes
+flask churn-monitor          # deriva de datos del modelo de abandono (PSI)
 ```
-
-## **Segmentacion**
-### *Creacion de datos .csv*
->! La base de datos debe estar actualizada al modelo mas reciente
-1. Ejecutar el notebook *DataPrepare_m1.ipynb* para generar el archivo .csv que contiene los datos para el entrenamiento del modulo
-
->se optiene *Datos históricos exportados a app/ia/segments/Data/kmeans_m1_data.csv*
-
-2. Cargar los datos *kmeans_m1_data.csv* al modelo de entrenamiento
->Ejecutar el archivo notebook *segment.ipynb*
-
->se optiene:
-- Resultados exportados a: Data\kmeans_segmented_results_m1.csv
-- Modelo guardado en: Data\kmeans_model.pkl
-- Scaler guardado en: Data\kmeans_scaler.pkl
 
 ## **Extensiones Recomendadas**
 ### *Extensiones de Visual Studio Code*
