@@ -1,1 +1,142 @@
+/*
+  Sistema de diseño del CRM (Tailwind CSS 4).
+
+  Para cambiar el aspecto de TODA la aplicación, edite solo este archivo:
+    1. @theme        -> colores, tipografía, radios, sombras y desenfoque del vidrio.
+    2. @utility      -> piezas reutilizables (vidrio, mosaico bento, etiquetas).
+    3. Fondo         -> las manchas de color difusas detrás del vidrio.
+  Los componentes usan nombres de token (bg-primary, text-ink, rounded-tile…),
+  nunca colores sueltos, así que un cambio aquí se refleja en todas las pantallas.
+*/
 @import "tailwindcss";
+@import "@fontsource-variable/lexend";
+
+@theme {
+  /* Tipografía: Lexend está diseñada para facilitar la lectura */
+  --font-sans: "Lexend Variable", ui-sans-serif, system-ui, sans-serif;
+  --text-xs: 0.8125rem;   /* 13 px: notas pequeñas */
+  --text-sm: 0.9375rem;   /* 15 px: texto secundario */
+  --text-base: 1.0625rem; /* 17 px: texto normal (grande para leer fácil) */
+  --text-lg: 1.25rem;     /* 20 px */
+  --text-xl: 1.625rem;    /* 26 px: títulos de mosaico */
+  --text-2xl: 2.125rem;   /* 34 px: cifras principales */
+  --text-3xl: 2.75rem;    /* 44 px */
+
+  /* Colores base */
+  --color-ink: #1e2b33;          /* texto principal */
+  --color-ink-soft: #4a5a63;     /* texto secundario */
+  --color-ink-faint: #6f7f88;    /* notas */
+  --color-mist: #eef3f1;         /* fondo "neblina andina" */
+  --color-primary: #1f7a5c;      /* verde cafetal: acciones principales */
+  --color-primary-strong: #175e47;
+  --color-primary-soft: #d6ece3;
+  --color-maize: #f2b544;        /* maíz: realces cálidos */
+  --color-sky: #6c8cff;          /* cielo: realces fríos */
+
+  /* Semáforo de riesgo de que el cliente no vuelva */
+  --color-risk-high: #c8443a;
+  --color-risk-high-soft: #f7dcd9;
+  --color-risk-mid: #c47d12;
+  --color-risk-mid-soft: #f8e9cf;
+  --color-risk-low: #2e8b57;
+  --color-risk-low-soft: #d8efe1;
+
+  /* Segmentos de valor */
+  --color-seg-high: #a87a12;     /* oro: mejores clientes */
+  --color-seg-high-soft: #f6ead0;
+  --color-seg-mid: #3f63c9;
+  --color-seg-mid-soft: #dde5fb;
+  --color-seg-low: #66737c;
+  --color-seg-low-soft: #e3e8eb;
+  --color-seg-new: #7d4fc9;
+  --color-seg-new-soft: #ece2fa;
+
+  /* Vidrio */
+  --color-glass: rgb(255 255 255 / 0.58);
+  --color-glass-strong: rgb(255 255 255 / 0.78);
+  --color-glass-edge: rgb(255 255 255 / 0.75);
+  --blur-glass: 18px;
+
+  /* Forma */
+  --radius-tile: 1.5rem;   /* mosaicos del bento */
+  --radius-control: 0.9rem;/* botones y campos */
+  --radius-chip: 999px;
+  --shadow-glass: 0 1px 0 0 rgb(255 255 255 / 0.7) inset, 0 12px 32px -12px rgb(30 43 51 / 0.18);
+  --shadow-lift: 0 1px 0 0 rgb(255 255 255 / 0.7) inset, 0 18px 40px -14px rgb(30 43 51 / 0.28);
+}
+
+/* ---------- Piezas reutilizables ---------- */
+
+/* Superficie de vidrio */
+@utility glass {
+  background-color: var(--color-glass);
+  border: 1px solid var(--color-glass-edge);
+  box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(var(--blur-glass)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(150%);
+}
+
+/* Vidrio más opaco (menús, ventanas emergentes) */
+@utility glass-strong {
+  background-color: var(--color-glass-strong);
+  border: 1px solid var(--color-glass-edge);
+  box-shadow: var(--shadow-lift);
+  backdrop-filter: blur(calc(var(--blur-glass) + 6px)) saturate(160%);
+  -webkit-backdrop-filter: blur(calc(var(--blur-glass) + 6px)) saturate(160%);
+}
+
+/* Rejilla bento: 1 columna en celular, 2 en tableta, 4 en escritorio */
+@utility bento {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  @media (width >= 40rem) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (width >= 64rem) { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; }
+}
+
+/* Variante de 2 columnas en escritorio (formularios, ofertas) */
+@utility bento-2 {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  @media (width >= 64rem) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    color: var(--color-ink);
+    background-color: var(--color-mist);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-mist);
+  }
+  /* Fondo: manchas de color difusas que dan vida al vidrio (capa fija, funciona también en iOS) */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(38rem 30rem at 8% 10%, rgb(31 122 92 / 0.28), transparent 70%),
+      radial-gradient(32rem 26rem at 92% 6%, rgb(242 181 68 / 0.32), transparent 70%),
+      radial-gradient(40rem 32rem at 70% 95%, rgb(108 140 255 / 0.26), transparent 70%);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-sky);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+}
