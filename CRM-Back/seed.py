@@ -1,9 +1,11 @@
 """
-Datos base del CRM: tipos de interacción, segmentos y catálogo de recomendaciones.
+Prepara la base de datos del CRM:
+1. Crea las tablas que falten (a partir de los modelos de app/models).
+2. Carga los datos base: tipos de interacción, segmentos y catálogo de recomendaciones.
 
 Uso:  python seed.py
 Se puede ejecutar las veces que quiera: crea lo que falte y actualiza nombres y
-descripciones de lo que ya existe (no borra clientes ni recomendaciones).
+descripciones de lo que ya existe (no borra tablas, clientes ni recomendaciones).
 
 Los nombres de segmento son los mismos que usan el frontend y los modelos de IA.
 """
@@ -83,4 +85,9 @@ def sembrar():
 if __name__ == "__main__":
     app = create_app()
     with app.app_context():
+        # Registrar todos los modelos antes de crear las tablas
+        from app.models import (user, customer, segmento, tipo_interaccion, interacciones_cliente,  # noqa: F401
+                                metricas_historicas, predicciones, recomendaciones, catalogo_recomendaciones)
+        db.create_all()
+        print("✅ Tablas listas")
         print("✅ Datos base listos:", sembrar())
